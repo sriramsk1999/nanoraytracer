@@ -7,7 +7,7 @@ CC = g++
 
 CFLAGS = -g
 INCFLAGS = -I./include/glm-0.9.7.1 -I./include/
-LDFLAGS =
+LDFLAGS = -L./lib/ -lfreeimage
 
 RM = /bin/rm -f
 all: nanoraytracer
