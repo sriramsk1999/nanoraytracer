@@ -48,22 +48,13 @@ EXTERN std::vector<vector<float>> pointLights; // Point Light Params
 
 // Materials (read from file)
 // With multiple objects, these are colors for each.
-EXTERN float ambient[4] ;
-EXTERN float diffuse[4] ;
-EXTERN float specular[4] ;
-EXTERN float emission[4] ;
+EXTERN float ambient[3] ;
+EXTERN float diffuse[3] ;
+EXTERN float specular[3] ;
+EXTERN float emission[3] ;
 EXTERN float shininess ;
 
-// For multiple objects, read from a file.
-const int maxobjects = 10 ;
-EXTERN int numobjects ;
-EXTERN struct object {
-  shape type ;
-  float size ;
-  float ambient[4] ;
-  float diffuse[4] ;
-  float specular[4] ;
-  float emission[4] ;
-  float shininess ;
-  mat4 transform ;
-} objects[maxobjects] ;
+// Vertices Array
+EXTERN std::vector<vector<float>> vertices; // Nx3 vertices
+EXTERN std::vector<vector<int>> triangles; // Nx3 triangles
+EXTERN std::vector<vector<float>> spheres; // Nx3 triangles

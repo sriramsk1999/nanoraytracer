@@ -131,7 +131,7 @@ void readfile(const char* filename)
 
         // Image Size and camera params
         else if (cmd == "size") {
-          validinput = readvals(s,2,values); 
+          validinput = readvals(s,2,values);
           if (validinput) { 
             w = (int) values[0]; h = (int) values[1]; 
           } 
@@ -148,43 +148,40 @@ void readfile(const char* filename)
           }
         }
 
-        // I've left the code for loading objects in the skeleton, so 
-        // you can get a sense of how this works.  
-        // Also look at demo.txt to get a sense of why things are done this way.
-        else if (cmd == "sphere" || cmd == "cube" || cmd == "teapot") {
-          if (numobjects == maxobjects) { // No more objects 
-            cerr << "Reached Maximum Number of Objects " << numobjects << " Will ignore further objects\n";
-          } else {
-            validinput = readvals(s, 1, values); 
-            if (validinput) {
-              object * obj = &(objects[numobjects]); 
-              obj->size = values[0]; 
-
-              // Set the object's light properties
-              for (i = 0; i < 4; i++) {
-                (obj->ambient)[i] = ambient[i]; 
-                (obj->diffuse)[i] = diffuse[i]; 
-                (obj->specular)[i] = specular[i]; 
-                (obj->emission)[i] = emission[i];
-              }
-              obj->shininess = shininess; 
-
-              // Set the object's transform
-              obj->transform = transfstack.top(); 
-
-              // Set the object's type
-              if (cmd == "sphere") {
-                obj->type = sphere; 
-              } else if (cmd == "cube") {
-                obj->type = cube; 
-              } else if (cmd == "teapot") {
-                obj->type = teapot; 
-              }
+        // Geometry
+        else if (cmd == "maxverts" or cmd == "maxvertnorms") {
+          ; // Not required
+        }
+        else if (cmd == "vertex") {
+          validinput = readvals(s, 3, values);
+          std::vector<float> vertex;
+          if (validinput) {
+            for (i = 0; i < 3; i++) {
+              vertex.push_back(values[i]);
             }
-            ++numobjects; 
+            vertices.push_back(vertex);
+          }
+        } else if (cmd == "tri") {
+          validinput = readvals(s, 3, values);
+          std::vector<int> triangle;
+          if (validinput) {
+            for (i = 0; i < 3; i++) {
+              triangle.push_back(values[i]);
+            }
+            triangles.push_back(triangle);
+          }
+        } else if (cmd == "sphere") {
+          validinput = readvals(s, 4, values);
+          std::vector<float> sphere;
+          if (validinput) {
+            for (i = 0; i < 4; i++) {
+              sphere.push_back(values[i]);
+            }
+            spheres.push_back(sphere);
           }
         }
 
+        // Transformations
         else if (cmd == "translate") {
           validinput = readvals(s,3,values); 
           if (validinput) {
