@@ -7,6 +7,8 @@
 // Since all files need access to it, we define EXTERN as either blank or
 // extern, depending on if included in the main program or not.
 
+#include <vector>
+
 #ifdef MAINPROGRAM
 #define EXTERN
 #else
@@ -40,12 +42,9 @@ enum shape {cube, sphere, teapot} ;
 EXTERN float sx, sy ; // the scale in x and y
 EXTERN float tx, ty ; // the translation in x and y
 
-// Lighting parameter array, similar to that in the fragment shader
-const int numLights = 10 ;
-EXTERN float lightposn [4*numLights] ; // Light Positions
-EXTERN float lightcolor[4*numLights] ; // Light Colors
-EXTERN float lightransf[4*numLights] ; // Lights transformed by modelview
-EXTERN int numused ;                     // How many lights are used
+// Lighting parameters array
+EXTERN std::vector<vector<float>> directionalLights; // Directional Light Params
+EXTERN std::vector<vector<float>> pointLights; // Point Light Params
 
 // Materials (read from file)
 // With multiple objects, these are colors for each.
@@ -68,14 +67,3 @@ EXTERN struct object {
   float shininess ;
   mat4 transform ;
 } objects[maxobjects] ;
-
-// Variables to set uniform params for lighting fragment shader
-EXTERN int lightcol ;
-EXTERN int lightpos ;
-EXTERN int numusedcol ;
-EXTERN int enablelighting ;
-EXTERN int ambientcol ;
-EXTERN int diffusecol ;
-EXTERN int specularcol ;
-EXTERN int emissioncol ;
-EXTERN int shininesscol ;

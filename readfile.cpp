@@ -74,24 +74,18 @@ void readfile(const char* filename)
         // Up to 10 params for cameras.  
         bool validinput; // Validity of input 
 
-        // Process the light, add it to database.
-        // Lighting Command
-        if (cmd == "light") {
-          if (numused == numLights) { // No more Lights 
-            cerr << "Reached Maximum Number of Lights " << numused << " Will ignore further lights\n";
-          } else {
-            validinput = readvals(s, 8, values); // Position/color for lts.
+        // Process the lighting params
+        if (cmd == "directional" or cmd == "point") {
+            validinput = readvals(s, 6, values); // Position/color for lts.
+            std::vector<float> lightParams;
             if (validinput) {
+              for (i = 0; i < 6; i++) {
+                lightParams.push_back(values[i]);
+              }
 
-              for (i = 0; i < 4; i++) {
-                lightposn[(numused*4) + i] = values[i];
-              }
-              for (i = 4; i < 8; i++) {
-                lightcolor[(numused*4) + i-4] = values[i];
-              }
-              ++numused; 
+              if (cmd == "directional") directionalLights.push_back(lightParams);
+              else pointLights.push_back(lightParams);
             }
-          }
         }
 
         // Material Commands 
@@ -101,30 +95,30 @@ void readfile(const char* filename)
         // Note that no transforms/stacks are applied to the colors. 
 
         else if (cmd == "ambient") {
-          validinput = readvals(s, 4, values); // colors 
+          validinput = readvals(s, 3, values); // colors
           if (validinput) {
-            for (i = 0; i < 4; i++) {
+            for (i = 0; i < 3; i++) {
               ambient[i] = values[i]; 
             }
           }
         } else if (cmd == "diffuse") {
-          validinput = readvals(s, 4, values); 
+          validinput = readvals(s, 3, values);
           if (validinput) {
-            for (i = 0; i < 4; i++) {
+            for (i = 0; i < 3; i++) {
               diffuse[i] = values[i]; 
             }
           }
         } else if (cmd == "specular") {
-          validinput = readvals(s, 4, values); 
+          validinput = readvals(s, 3, values);
           if (validinput) {
-            for (i = 0; i < 4; i++) {
+            for (i = 0; i < 3; i++) {
               specular[i] = values[i]; 
             }
           }
         } else if (cmd == "emission") {
-          validinput = readvals(s, 4, values); 
+          validinput = readvals(s, 3, values);
           if (validinput) {
-            for (i = 0; i < 4; i++) {
+            for (i = 0; i < 3; i++) {
               emission[i] = values[i]; 
             }
           }
@@ -133,7 +127,10 @@ void readfile(const char* filename)
           if (validinput) {
             shininess = values[0]; 
           }
-        } else if (cmd == "size") {
+        }
+
+        // Image Size and camera params
+        else if (cmd == "size") {
           validinput = readvals(s,2,values); 
           if (validinput) { 
             w = (int) values[0]; h = (int) values[1]; 
