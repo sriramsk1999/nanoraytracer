@@ -25,19 +25,17 @@ vec3 upinit(0.0,1.0,0.0) ; // Initial up position, also for resets
 vec3 center(0.0,0.0,0.0) ; // Center look at point
 int amountinit = 5;
 int w = 500, h = 500 ; // width and height
-float fovy = 90.0 ; // For field of view
+float fovx = 90.0, fovy = 90.0 ; // For field of view
 #else
 EXTERN vec3 eyeinit ;
 EXTERN vec3 upinit ;
 EXTERN vec3 center ;
 EXTERN int amountinit;
 EXTERN int w, h ;
-EXTERN float fovy ;
+EXTERN float fovx, fovy ;
 #endif
 
 EXTERN mat4 projection, modelview; // The mvp matrices
-EXTERN int projectionPos, modelviewPos; // Uniform locations of the above matrices
-static enum {view, translate, scale} transop ; // which operation to transform
 enum shape {cube, sphere, teapot} ;
 EXTERN float sx, sy ; // the scale in x and y
 EXTERN float tx, ty ; // the translation in x and y

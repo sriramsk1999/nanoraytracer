@@ -241,7 +241,8 @@ void readfile(const char* filename)
     up = upinit; 
     amount = amountinit;
     sx = sy = 1.0;  // keyboard controlled scales in x and y 
-    tx = ty = 0.0;  // keyboard controllled translation in x and y  
+    tx = ty = 0.0;  // keyboard controllled translation in x and y
+    fovx = glm::degrees(2 * atan( tan(glm::radians(fovy / 2)) ) * ((float) w/ h));
   } else {
     cerr << "Unable to Open Input Data File " << filename << "\n"; 
     throw 2; 
