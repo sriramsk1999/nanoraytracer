@@ -38,7 +38,7 @@ vec3 rayCast(float i_loc, float j_loc) {
 
 bool checkIntersection(vec3 eye, vec3 ray_dirn) {
   vec3 a, b, c, triNorm, hitPoint;
-  float ray2Plane, alpha, beta, gamma, triArea;
+  float ray2Plane, pointA, pointB, pointC;
   bool isIntersect = false;
   for (int i = 0; i < triangles.size(); i++) {
     // Fetch vertices of triangle
@@ -47,27 +47,17 @@ bool checkIntersection(vec3 eye, vec3 ray_dirn) {
     c = vertices[triangles[i][2]];
     triNorm = normalize( cross(c-a, b-a) );
 
-    // ray_dirn = vec3(0,0,-1);
-
     ray2Plane = ( dot(a, triNorm) - dot(eye, triNorm) ) / dot( ray_dirn, triNorm );
     hitPoint = eye + ray_dirn*ray2Plane;
-    // std::cout << hitPoint[0] << " " << hitPoint[1] << " " << hitPoint[2] << "\n";
-    // std::cout << ray_dirn[0] << " " << ray_dirn[1] << " " << ray_dirn[2] << "\n";
 
-    // triArea = length(cross(b-a, c-a))/2;
-    // alpha = length(cross(b-hitPoint, c-hitPoint)) / (2*triArea);
-    // beta  = length(cross(c-hitPoint, a-hitPoint)) / (2*triArea);
-    // gamma = 1 - alpha - beta;
-    // if (alpha >=0 and alpha < 1 and beta >=0 and beta < 1 and gamma >=0 and gamma < 1) {
-    //   std::cout << "hitPoint " << hitPoint[0] << " " << hitPoint[1] << " " << hitPoint[2] << "\n";
-    //   isIntersect = true;
-    // }
-    if (hitPoint[0] >= -1 and hitPoint[0] <= 1 and hitPoint[1] >=-1 and hitPoint[0] <=1) {
-      //std::cout << "hitPoint " << hitPoint[0] << " " << hitPoint[1] << " " << hitPoint[2] << "\n";
+    pointA = cross(b-a, hitPoint-a)[2];
+    pointB = cross(c-b, hitPoint-b)[2];
+    pointC = cross(a-c, hitPoint-c)[2];
+
+    if ((pointA>0 and pointB>0 and pointC>0) or (pointA<=0 and pointB<=0 and pointC<=0)) {
       isIntersect=true;
     }
   }
-  // std::cout << "------\n";
   return isIntersect;
 }
 
@@ -81,7 +71,7 @@ void raytrace(FIBITMAP* img, int w, int h) {
 
       rayDirn = rayCast(i_loc, j_loc);
       isIntersect = checkIntersection(eye, rayDirn);
-      if (isIntersect) setRedColor(img, i, j);
+      if (isIntersect) setRedColor(img, i, h-j);
     }
   }
   return ;
