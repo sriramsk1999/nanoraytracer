@@ -154,20 +154,16 @@ void readfile(const char* filename)
         }
         else if (cmd == "vertex") {
           validinput = readvals(s, 3, values);
-          std::vector<float> vertex;
+          vec3 vertex;
           if (validinput) {
-            for (i = 0; i < 3; i++) {
-              vertex.push_back(values[i]);
-            }
+            vertex = vec3(values[0], values[1], values[2]);
             vertices.push_back(vertex);
           }
         } else if (cmd == "tri") {
           validinput = readvals(s, 3, values);
-          std::vector<int> triangle;
+          vec3 triangle;
           if (validinput) {
-            for (i = 0; i < 3; i++) {
-              triangle.push_back(values[i]);
-            }
+            triangle = vec3(values[0], values[1], values[2]);
             triangles.push_back(triangle);
           }
         } else if (cmd == "sphere") {

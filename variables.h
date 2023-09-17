@@ -53,6 +53,6 @@ EXTERN float emission[3] ;
 EXTERN float shininess ;
 
 // Vertices Array
-EXTERN std::vector<vector<float>> vertices; // Nx3 vertices
-EXTERN std::vector<vector<int>> triangles; // Nx3 triangles
-EXTERN std::vector<vector<float>> spheres; // Nx3 triangles
+EXTERN std::vector<vec3> vertices; // Nx3 vertices
+EXTERN std::vector<vec3> triangles; // Nx3 triangles
+EXTERN std::vector<vector<float>> spheres; // Nx3 spheres
