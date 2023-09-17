@@ -14,22 +14,18 @@ using namespace std;
 #include "variables.h"
 #include "readfile.h" // prototypes for readfile.cpp
 
-void colorizeDummyImage(FIBITMAP* img) {
+void setRedColor(FIBITMAP* img, int i, int j) {
   RGBQUAD color;
-  for (int i=0; i < w; i++) {
-    for (int j=0; j < h; j++) {
-      color.rgbRed = 0;
-      color.rgbGreen = (double)i/w*255.0;
-      color.rgbBlue = (double)j/h*255.0;
-      FreeImage_SetPixelColor(img, i, j, &color);
-    }
-  }
+  color.rgbRed = 255;
+  color.rgbGreen = 0;
+  color.rgbBlue = 0;
+  FreeImage_SetPixelColor(img, i, j, &color);
 }
 
-vec3 raycast(float i_loc, float j_loc) {
+vec3 rayCast(float i_loc, float j_loc) {
   float alpha, beta;
 
-  alpha = tan( glm::radians (fovx / 2) ) * (j_loc - (w/2))/(w/2);
+  alpha = tan( glm::radians (fovx / 2) ) * (i_loc - (w/2))/(w/2);
   beta = tan( glm::radians (fovy / 2) ) * ((h/2) - j_loc)/(h/2);
 
   vec3 w_vec = normalize(eye-center);
@@ -40,19 +36,52 @@ vec3 raycast(float i_loc, float j_loc) {
   return ray_direction;
 }
 
-void check_intersection(vec3 eye, vec3 ray_dirn) {
-  ;
+bool checkIntersection(vec3 eye, vec3 ray_dirn) {
+  vec3 a, b, c, triNorm, hitPoint;
+  float ray2Plane, alpha, beta, gamma, triArea;
+  bool isIntersect = false;
+  for (int i = 0; i < triangles.size(); i++) {
+    // Fetch vertices of triangle
+    a = vertices[triangles[i][0]];
+    b = vertices[triangles[i][1]];
+    c = vertices[triangles[i][2]];
+    triNorm = normalize( cross(c-a, b-a) );
+
+    // ray_dirn = vec3(0,0,-1);
+
+    ray2Plane = ( dot(a, triNorm) - dot(eye, triNorm) ) / dot( ray_dirn, triNorm );
+    hitPoint = eye + ray_dirn*ray2Plane;
+    // std::cout << hitPoint[0] << " " << hitPoint[1] << " " << hitPoint[2] << "\n";
+    // std::cout << ray_dirn[0] << " " << ray_dirn[1] << " " << ray_dirn[2] << "\n";
+
+    // triArea = length(cross(b-a, c-a))/2;
+    // alpha = length(cross(b-hitPoint, c-hitPoint)) / (2*triArea);
+    // beta  = length(cross(c-hitPoint, a-hitPoint)) / (2*triArea);
+    // gamma = 1 - alpha - beta;
+    // if (alpha >=0 and alpha < 1 and beta >=0 and beta < 1 and gamma >=0 and gamma < 1) {
+    //   std::cout << "hitPoint " << hitPoint[0] << " " << hitPoint[1] << " " << hitPoint[2] << "\n";
+    //   isIntersect = true;
+    // }
+    if (hitPoint[0] >= -1 and hitPoint[0] <= 1 and hitPoint[1] >=-1 and hitPoint[0] <=1) {
+      //std::cout << "hitPoint " << hitPoint[0] << " " << hitPoint[1] << " " << hitPoint[2] << "\n";
+      isIntersect=true;
+    }
+  }
+  // std::cout << "------\n";
+  return isIntersect;
 }
 
 void raytrace(FIBITMAP* img, int w, int h) {
   float i_loc, j_loc;
-  vec3 ray_dirn;
+  vec3 rayDirn;
+  bool isIntersect;
   for (int i=0; i < w; i++) {
     for (int j=0; j < h; j++) {
       i_loc = i+0.5; j_loc = j+0.5; // cast ray through center of pixel
 
-      ray_dirn = raycast(i_loc, j_loc);
-      check_intersection(eye, ray_dirn);
+      rayDirn = rayCast(i_loc, j_loc);
+      isIntersect = checkIntersection(eye, rayDirn);
+      if (isIntersect) setRedColor(img, i, j);
     }
   }
   return ;
