@@ -8,6 +8,7 @@
 #include <FreeImage.h>
 #include "Transform.h"
 #include "Scene.h"
+#include "Raytracer.h"
 
 using namespace std;
 
@@ -84,6 +85,7 @@ int main(int argc, char *argv[]) {
     exit(-1);
   }
   Scene scene;
+  Raytracer raytracer;
   FreeImage_Initialise();
   readfile(argv[1], scene);
 
