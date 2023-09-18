@@ -5,8 +5,9 @@
 #include <deque>
 #include <stack>
 
-#include "Transform.h"
 #include <FreeImage.h>
+#include "Transform.h"
+#include "Scene.h"
 
 using namespace std;
 
@@ -82,8 +83,9 @@ int main(int argc, char *argv[]) {
     cerr << "Usage: nanoraytracer scenefile \n";
     exit(-1);
   }
+  Scene scene;
   FreeImage_Initialise();
-  readfile(argv[1]) ;
+  readfile(argv[1], scene);
 
   int bitsPerPixel = 24;
   FIBITMAP* img = FreeImage_Allocate(w, h, bitsPerPixel);

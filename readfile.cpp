@@ -50,7 +50,7 @@ bool readvals(stringstream &s, const int numvals, float* values)
   return true; 
 }
 
-void readfile(const char* filename) 
+void readfile(const char* filename, Scene& scene)
 {
   string str, cmd; 
   ifstream in;
@@ -85,6 +85,8 @@ void readfile(const char* filename)
 
               if (cmd == "directional") directionalLights.push_back(lightParams);
               else pointLights.push_back(lightParams);
+
+              scene.addLights(cmd, lightParams);
             }
         }
 
@@ -134,7 +136,8 @@ void readfile(const char* filename)
           validinput = readvals(s,2,values);
           if (validinput) { 
             w = (int) values[0]; h = (int) values[1]; 
-          } 
+          }
+          scene.setImageResolution(w, h);
         } else if (cmd == "camera") {
           validinput = readvals(s,10,values); // 10 values eye cen up fov
           if (validinput) {
@@ -159,6 +162,7 @@ void readfile(const char* filename)
             vertex = vec3(values[0], values[1], values[2]);
             vertices.push_back(vertex);
           }
+          scene.addVertexToScene(vertex);
         } else if (cmd == "tri") {
           validinput = readvals(s, 3, values);
           vec3 triangle;
@@ -166,6 +170,7 @@ void readfile(const char* filename)
             triangle = vec3(values[0], values[1], values[2]);
             triangles.push_back(triangle);
           }
+          scene.addTriangleToScene(triangle);
         } else if (cmd == "sphere") {
           validinput = readvals(s, 4, values);
           std::vector<float> sphere;
@@ -175,6 +180,7 @@ void readfile(const char* filename)
             }
             spheres.push_back(sphere);
           }
+          scene.addSphereToScene(sphere);
         }
 
         // Transformations
@@ -236,9 +242,8 @@ void readfile(const char* filename)
     eye = eyeinit; 
     up = upinit; 
     amount = amountinit;
-    sx = sy = 1.0;  // keyboard controlled scales in x and y 
-    tx = ty = 0.0;  // keyboard controllled translation in x and y
     fovx = glm::degrees(2 * atan( tan(glm::radians(fovy / 2)) ) * ((float) w/ h));
+    scene.addCamera(eye, center, up, fovy);
   } else {
     cerr << "Unable to Open Input Data File " << filename << "\n"; 
     throw 2; 

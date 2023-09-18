@@ -4,6 +4,9 @@
 // Rotate is a helper function
 
 // Include the helper glm library, including matrix transform extensions
+#ifndef TRANSFORM_H_
+#define TRANSFORM_H_
+
 #ifndef GLM_FORCE_RADIANS
 #define GLM_FORCE_RADIANS
 #endif
@@ -35,3 +38,5 @@ public:
         static vec3 upvector(const vec3 &up, const vec3 &zvec) ; 
 };
 
+
+#endif // TRANSFORM_H_
