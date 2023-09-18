@@ -23,33 +23,33 @@ void setRedColor(FIBITMAP* img, int i, int j) {
   FreeImage_SetPixelColor(img, i, j, &color);
 }
 
-vec3 rayCast(float i_loc, float j_loc) {
+vec3 rayCast(float i_loc, float j_loc, Scene& scene) {
   float alpha, beta;
 
-  alpha = tan( glm::radians (fovx / 2) ) * (i_loc - (w/2))/(w/2);
-  beta = tan( glm::radians (fovy / 2) ) * ((h/2) - j_loc)/(h/2);
+  alpha = tan( (scene.fieldOfViewX / 2) ) * (i_loc - (scene.width/2))/(scene.width/2);
+  beta = tan( (scene.fieldOfViewY / 2) ) * ((scene.height/2) - j_loc)/(scene.height/2);
 
-  vec3 w_vec = normalize(eye-center);
-  vec3 u_vec = normalize(cross(up, w_vec));
+  vec3 w_vec = normalize(scene.eye-scene.center);
+  vec3 u_vec = normalize(cross(scene.up, w_vec));
   vec3 v_vec = cross(w_vec, u_vec);
 
   vec3 ray_direction = normalize( alpha*u_vec + beta*v_vec - w_vec);
   return ray_direction;
 }
 
-bool checkIntersection(vec3 eye, vec3 ray_dirn) {
+bool checkIntersection(vec3 eye, vec3 ray_dirn, Scene& scene) {
   vec3 a, b, c, triNorm, hitPoint;
   float ray2Plane, pointA, pointB, pointC;
   bool isIntersect = false;
-  for (int i = 0; i < triangles.size(); i++) {
+  for (int i = 0; i < scene.triangles.size(); i++) {
     // Fetch vertices of triangle
-    a = vertices[triangles[i][0]];
-    b = vertices[triangles[i][1]];
-    c = vertices[triangles[i][2]];
+    a = scene.vertices[scene.triangles[i][0]];
+    b = scene.vertices[scene.triangles[i][1]];
+    c = scene.vertices[scene.triangles[i][2]];
     triNorm = normalize( cross(c-a, b-a) );
 
     ray2Plane = ( dot(a, triNorm) - dot(eye, triNorm) ) / dot( ray_dirn, triNorm );
-    hitPoint = eye + ray_dirn*ray2Plane;
+    hitPoint = scene.eye + ray_dirn*ray2Plane;
 
     pointA = cross(b-a, hitPoint-a)[2];
     pointB = cross(c-b, hitPoint-b)[2];
@@ -62,7 +62,7 @@ bool checkIntersection(vec3 eye, vec3 ray_dirn) {
   return isIntersect;
 }
 
-void raytrace(FIBITMAP* img, int w, int h) {
+void raytrace(FIBITMAP* img, int w, int h, Scene& scene) {
   float i_loc, j_loc;
   vec3 rayDirn;
   bool isIntersect;
@@ -70,8 +70,8 @@ void raytrace(FIBITMAP* img, int w, int h) {
     for (int j=0; j < h; j++) {
       i_loc = i+0.5; j_loc = j+0.5; // cast ray through center of pixel
 
-      rayDirn = rayCast(i_loc, j_loc);
-      isIntersect = checkIntersection(eye, rayDirn);
+      rayDirn = rayCast(i_loc, j_loc, scene);
+      isIntersect = checkIntersection(eye, rayDirn, scene);
       if (isIntersect) setRedColor(img, i, h-j);
     }
   }
@@ -91,7 +91,7 @@ int main(int argc, char *argv[]) {
   FIBITMAP* img = FreeImage_Allocate(w, h, bitsPerPixel);
   string fname = "output.png";
 
-  raytrace(img, w, h);
+  raytrace(img, w, h, scene);
 
   FreeImage_Save(FIF_PNG, img, fname.c_str(), 0);
 

@@ -20,20 +20,21 @@ class Scene {
         void addTriangleToScene(vec3& triangle);
         void addSphereToScene(vector<float>& sphere);
 
+        // Camera params
+        vec3 eye, center, up;
+        float fieldOfViewX, fieldOfViewY;
+        int width, height; //Image Resolution
+
+        // Objects in the scene
+        vector<vec3> vertices; // Nx3 vertices
+        vector<vec3> triangles; // Nx3 triangles
+        vector<vector<float>> spheres; // Nx3 spheres
+
     private:
         // Lighting parameters array
         vector<vector<float>> directionalLights; // Directional Light Params
         vector<vector<float>> pointLights; // Point Light Params
 
-        int width, height; //Image Resolution
-        // Camera params
-        float fovx, fovy;
-        vec3 eye, center, up;
-
-        // Objects in the scene
-        vector<vec3> allVertices; // Nx3 vertices
-        vector<vec3> allTriangles; // Nx3 triangles
-        vector<vector<float>> allSpheres; // Nx3 spheres
 };
 
 #endif // SCENE_H_

@@ -3,11 +3,11 @@
 #include <stdexcept>
 
 void Scene::addCamera(vec3 eye, vec3 center, vec3 up, float fovy) {
-  eye = eye;
-  center = center;
-  up = up;
-  fovy = glm::radians(fovy);
-  fovx = (2 * atan( tan(fovy / 2) ) * ((float) width/ height));
+  Scene::eye = eye;
+  Scene::center = center;
+  Scene::up = up;
+  Scene::fieldOfViewY = glm::radians(fovy);
+  Scene::fieldOfViewX = (2 * atan( tan(fieldOfViewY / 2) ) * ((float) width/ height));
 }
 
 void Scene::setImageResolution(int w, int h) {
@@ -22,15 +22,15 @@ void Scene::addLights(std::string lightType, std::vector<float>& lightParams) {
 }
 
 void Scene::addVertexToScene(vec3& vertex) {
-  allVertices.push_back(vertex);
+  vertices.push_back(vertex);
 }
 
 void Scene::addTriangleToScene(vec3& triangle) {
-  allTriangles.push_back(triangle);
+  triangles.push_back(triangle);
 }
 
 void Scene::addSphereToScene(vector<float>& sphere) {
-  allSpheres.push_back(sphere);
+  spheres.push_back(sphere);
 }
 
 Scene::Scene() {
