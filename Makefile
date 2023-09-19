@@ -11,11 +11,11 @@ LDFLAGS = -L./lib/ -lfreeimage
 
 RM = /bin/rm -f
 all: nanoraytracer
-nanoraytracer: main.o Transform.o Scene.o Raytracer.o readfile.o variables.h readfile.h Transform.h
+nanoraytracer: main.o Transform.o Scene.o Raytracer.o readfile.o readfile.h Transform.h
 	$(CC) $(CFLAGS) -o nanoraytracer main.o Transform.o Scene.o Raytracer.o readfile.o $(INCFLAGS) $(LDFLAGS)
-main.o: main.cpp Transform.h variables.h
+main.o: main.cpp Transform.h
 	$(CC) $(CFLAGS) $(INCFLAGS) -c main.cpp
-readfile.o: readfile.cpp readfile.h variables.h
+readfile.o: readfile.cpp readfile.h
 	$(CC) $(CFLAGS) $(INCFLAGS) -c readfile.cpp
 Transform.o: Transform.cpp Transform.h
 	$(CC) $(CFLAGS) $(INCFLAGS) -c Transform.cpp

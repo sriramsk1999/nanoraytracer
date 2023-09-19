@@ -27,7 +27,6 @@
 #include "Transform.h"
 
 using namespace std;
-#include "variables.h"
 #include "readfile.h"
 
 void rightmultiply(const mat4 & M, stack<mat4> &transfstack)
@@ -54,6 +53,17 @@ void readfile(const char* filename, Scene& scene)
 {
   string str, cmd; 
   ifstream in;
+
+  vec3 eye, up, center; // Positions of eye, center, up vectors
+  int w, h; // Image size
+  float fovx, fovy; // FOV of image
+  // Material properties
+  float ambient[3] ;
+  float diffuse[3] ;
+  float specular[3] ;
+  float emission[3] ;
+  float shininess ;
+
   in.open(filename); 
   if (in.is_open()) {
 
@@ -82,9 +92,6 @@ void readfile(const char* filename, Scene& scene)
               for (i = 0; i < 6; i++) {
                 lightParams.push_back(values[i]);
               }
-
-              if (cmd == "directional") directionalLights.push_back(lightParams);
-              else pointLights.push_back(lightParams);
 
               scene.addLights(cmd, lightParams);
             }
@@ -142,10 +149,10 @@ void readfile(const char* filename, Scene& scene)
           validinput = readvals(s,10,values); // 10 values eye cen up fov
           if (validinput) {
 
-            eyeinit = vec3(values[0], values[1], values[2]);
+            eye = vec3(values[0], values[1], values[2]);
             center = vec3(values[3], values[4], values[5]);
-            upinit = vec3(values[6], values[7], values[8]);
-            upinit = Transform::upvector(upinit, eyeinit-center);
+            up = vec3(values[6], values[7], values[8]);
+            up = Transform::upvector(up, eye-center);
             fovy = values[9];
 
           }
@@ -160,7 +167,6 @@ void readfile(const char* filename, Scene& scene)
           vec3 vertex;
           if (validinput) {
             vertex = vec3(values[0], values[1], values[2]);
-            vertices.push_back(vertex);
           }
           scene.addVertexToScene(vertex);
         } else if (cmd == "tri") {
@@ -168,7 +174,6 @@ void readfile(const char* filename, Scene& scene)
           vec3 triangle;
           if (validinput) {
             triangle = vec3(values[0], values[1], values[2]);
-            triangles.push_back(triangle);
           }
           scene.addTriangleToScene(triangle);
         } else if (cmd == "sphere") {
@@ -178,7 +183,6 @@ void readfile(const char* filename, Scene& scene)
             for (i = 0; i < 4; i++) {
               sphere.push_back(values[i]);
             }
-            spheres.push_back(sphere);
           }
           scene.addSphereToScene(sphere);
         }
@@ -236,12 +240,6 @@ void readfile(const char* filename, Scene& scene)
       getline (in, str); 
     }
 
-    // Set up initial position for eye, up and amount
-    // As well as booleans 
-
-    eye = eyeinit; 
-    up = upinit; 
-    amount = amountinit;
     fovx = glm::degrees(2 * atan( tan(glm::radians(fovy / 2)) ) * ((float) w/ h));
     scene.addCamera(eye, center, up, fovy);
   } else {
