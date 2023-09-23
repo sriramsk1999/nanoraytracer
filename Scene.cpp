@@ -33,10 +33,11 @@ void Scene::addSphereToScene(vector<float>& sphere) {
   spheres.push_back(sphere);
 }
 
-Scene::Scene() {
 
+float Triangle::hitTest(vec3& eye, vec3& rayDirection) {
+  return 0.0;
 }
 
-Scene::~Scene() {
-
+float Sphere::hitTest(vec3& eye, vec3& rayDirection) {
+  return 0.0;
 }

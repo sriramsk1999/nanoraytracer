@@ -56,7 +56,8 @@ void readfile(const char* filename, Scene& scene)
 
   vec3 eye, up, center; // Positions of eye, center, up vectors
   int w, h; // Image size
-  float fovx, fovy; // FOV of image
+  float fovy; // FOV of image
+  vector <vec3> allVertices;
   // Material properties
   float ambient[3] ;
   float diffuse[3] ;
@@ -169,12 +170,16 @@ void readfile(const char* filename, Scene& scene)
             vertex = vec3(values[0], values[1], values[2]);
           }
           scene.addVertexToScene(vertex);
+          allVertices.push_back(vertex);
         } else if (cmd == "tri") {
           validinput = readvals(s, 3, values);
           vec3 triangle;
           if (validinput) {
             triangle = vec3(values[0], values[1], values[2]);
           }
+          Triangle tri(allVertices[values[0]], allVertices[values[1]],
+                       allVertices[values[2]], ambient, diffuse,
+                       specular, emission, shininess);
           scene.addTriangleToScene(triangle);
         } else if (cmd == "sphere") {
           validinput = readvals(s, 4, values);
@@ -184,6 +189,8 @@ void readfile(const char* filename, Scene& scene)
               sphere.push_back(values[i]);
             }
           }
+          Sphere sphr(values[0], values[1], values[2], values[3],
+                      ambient, diffuse, specular, emission, shininess);
           scene.addSphereToScene(sphere);
         }
 
@@ -240,7 +247,6 @@ void readfile(const char* filename, Scene& scene)
       getline (in, str); 
     }
 
-    fovx = glm::degrees(2 * atan( tan(glm::radians(fovy / 2)) ) * ((float) w/ h));
     scene.addCamera(eye, center, up, fovy);
   } else {
     cerr << "Unable to Open Input Data File " << filename << "\n"; 
