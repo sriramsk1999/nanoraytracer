@@ -47,7 +47,8 @@ bool Raytracer::checkIntersection(Scene& scene, vec3 rayDirection) {
     pointB = cross(c-b, hitPoint-b)[2];
     pointC = cross(a-c, hitPoint-c)[2];
 
-    if ((pointA>0 and pointB>0 and pointC>0) or (pointA<=0 and pointB<=0 and pointC<=0)) {
+    if ((pointA>=0 and pointB>=0 and pointC>=0) or
+        (pointA<=0 and pointB<=0 and pointC<=0)) {
       isIntersect=true;
     }
   }

@@ -7,7 +7,7 @@ void Scene::addCamera(vec3 eye, vec3 center, vec3 up, float fovy) {
   Scene::center = center;
   Scene::up = up;
   Scene::fieldOfViewY = glm::radians(fovy);
-  Scene::fieldOfViewX = (2 * atan( tan(fieldOfViewY / 2) ) * ((float) width/ height));
+  Scene::fieldOfViewX = (2 * atan( tan(fieldOfViewY / 2) * ((float) width/ height)));
 }
 
 void Scene::setImageResolution(int w, int h) {
