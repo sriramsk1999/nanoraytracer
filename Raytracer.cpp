@@ -33,24 +33,10 @@ bool Raytracer::checkIntersection(Scene& scene, vec3 rayDirection) {
   vec3 a, b, c, triNorm, hitPoint;
   float ray2Plane, pointA, pointB, pointC;
   bool isIntersect = false;
-  for (int i = 0; i < scene.triangles.size(); i++) {
-    // Fetch vertices of triangle
-    a = scene.vertices[scene.triangles[i][0]];
-    b = scene.vertices[scene.triangles[i][1]];
-    c = scene.vertices[scene.triangles[i][2]];
-    triNorm = normalize( cross(c-a, b-a) );
-
-    ray2Plane = ( dot(a, triNorm) - dot(scene.eye, triNorm) ) / dot( rayDirection, triNorm );
-    hitPoint = scene.eye + rayDirection*ray2Plane;
-
-    pointA = cross(b-a, hitPoint-a)[2];
-    pointB = cross(c-b, hitPoint-b)[2];
-    pointC = cross(a-c, hitPoint-c)[2];
-
-    if ((pointA>=0 and pointB>=0 and pointC>=0) or
-        (pointA<=0 and pointB<=0 and pointC<=0)) {
-      isIntersect=true;
-    }
+  float hitDistance;
+  for (auto obj : scene.sceneObjects) {
+    hitDistance = obj->hitTest(scene.eye, rayDirection);
+    isIntersect = (bool) (hitDistance) or isIntersect;
   }
   return isIntersect;
 }

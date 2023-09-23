@@ -70,10 +70,6 @@ class Scene {
         */
         void addObjectToScene(shared_ptr<SceneObject> sceneObj);
 
-        void addVertexToScene(vec3& vertex);
-        void addTriangleToScene(vec3& triangle);
-        void addSphereToScene(vector<float>& sphere);
-
         // Camera params
         vec3 eye, center, up;
         float fieldOfViewX, fieldOfViewY;
@@ -81,10 +77,6 @@ class Scene {
 
         // Objects in the scene
         vector<shared_ptr<SceneObject>> sceneObjects;
-
-        vector<vec3> vertices; // Nx3 vertices
-        vector<vec3> triangles; // Nx3 triangles
-        vector<vector<float>> spheres; // Nx3 spheres
 
         // Lighting parameters array
         vector<vector<float>> directionalLights; // Directional Light Params
@@ -124,6 +116,16 @@ class Triangle : public SceneObject {
         *
         */
         virtual void printInfo();
+        /**
+        * Perform hit test on triangle.
+        * Check if the ray cast from eye
+        * intersects with the triangle.
+        *
+        * @param eye - Emissive color of object (r,g,b)
+        * @param rayDirection - Shininess of object
+        * @return Returns the distance from the eye to the triangle,
+        * or -1 if ray does not intersect.
+        */
         virtual float hitTest(vec3& eye, vec3& rayDirection);
 
   private:

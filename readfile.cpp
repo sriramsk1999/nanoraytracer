@@ -59,6 +59,7 @@ void readfile(const char* filename, Scene& scene)
   int w, h; // Image size
   float fovy; // FOV of image
   vector <vec3> allVertices;
+  vec3 vertex;
   // Material properties
   float ambient[3] = {0, 0, 0};
   float diffuse[3] = {0, 0, 0};
@@ -166,40 +167,30 @@ void readfile(const char* filename, Scene& scene)
         }
         else if (cmd == "vertex") {
           validinput = readvals(s, 3, values);
-          vec3 vertex;
           if (validinput) {
             vertex = vec3(values[0], values[1], values[2]);
-          }
-          scene.addVertexToScene(vertex);
           allVertices.push_back(vertex);
+          }
         } else if (cmd == "tri") {
           validinput = readvals(s, 3, values);
-          vec3 triangle;
           if (validinput) {
-            triangle = vec3(values[0], values[1], values[2]);
+            std::shared_ptr<SceneObject> tri =
+              std::make_shared<Triangle>(allVertices[values[0]],
+                                        allVertices[values[1]],
+                                        allVertices[values[2]],
+                                        ambient, diffuse, specular,
+                                        emission, shininess);
+            scene.addObjectToScene(tri);
           }
-          std::shared_ptr<SceneObject> tri =
-            std::make_shared<Triangle>(allVertices[values[0]],
-                                       allVertices[values[1]],
-                                       allVertices[values[2]],
-                                       ambient, diffuse, specular,
-                                       emission, shininess);
-          scene.addTriangleToScene(triangle);
-          scene.addObjectToScene(tri);
         } else if (cmd == "sphere") {
           validinput = readvals(s, 4, values);
-          std::vector<float> sphere;
           if (validinput) {
-            for (i = 0; i < 4; i++) {
-              sphere.push_back(values[i]);
-            }
+            std::shared_ptr<SceneObject> sphr =
+              std::make_shared<Sphere>(values[0], values[1], values[2],
+                                      values[3], ambient, diffuse,
+                                      specular, emission, shininess);
+            scene.addObjectToScene(sphr);
           }
-          std::shared_ptr<SceneObject> sphr =
-            std::make_shared<Sphere>(values[0], values[1], values[2],
-                                     values[3], ambient, diffuse,
-                                     specular, emission, shininess);
-          scene.addSphereToScene(sphere);
-          scene.addObjectToScene(sphr);
         }
 
         // Transformations

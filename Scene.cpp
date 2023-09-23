@@ -26,18 +26,6 @@ void Scene::addObjectToScene(std::shared_ptr<SceneObject> sceneObj) {
   sceneObjects.push_back(sceneObj);
 }
 
-void Scene::addVertexToScene(vec3& vertex) {
-  vertices.push_back(vertex);
-}
-
-void Scene::addTriangleToScene(vec3& triangle) {
-  triangles.push_back(triangle);
-}
-
-void Scene::addSphereToScene(vector<float>& sphere) {
-  spheres.push_back(sphere);
-}
-
 void Triangle::printInfo() {
   std::cout <<
     "Object Type : Triangle\n\
@@ -52,7 +40,22 @@ void Triangle::printInfo() {
 }
 
 float Triangle::hitTest(vec3& eye, vec3& rayDirection) {
-  return 0.0;
+    vec3 triNorm = normalize( cross(c-a, b-a) );
+    vec3 hitPoint;
+    float ray2Plane, pointA, pointB, pointC, hitDistance=0.;
+
+    ray2Plane = ( dot(a, triNorm) - dot(eye, triNorm) ) / dot( rayDirection, triNorm );
+    hitPoint = eye + rayDirection*ray2Plane;
+
+    pointA = cross(b-a, hitPoint-a)[2];
+    pointB = cross(c-b, hitPoint-b)[2];
+    pointC = cross(a-c, hitPoint-c)[2];
+
+    if ((pointA>=0 and pointB>=0 and pointC>=0) or
+        (pointA<=0 and pointB<=0 and pointC<=0)) {
+      hitDistance=1.;
+    }
+  return hitDistance;
 }
 
 void Sphere::printInfo() {
