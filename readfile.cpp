@@ -24,6 +24,7 @@
 #include <sstream>
 #include <deque>
 #include <stack>
+#include <memory>
 #include "Transform.h"
 
 using namespace std;
@@ -59,11 +60,11 @@ void readfile(const char* filename, Scene& scene)
   float fovy; // FOV of image
   vector <vec3> allVertices;
   // Material properties
-  float ambient[3] ;
-  float diffuse[3] ;
-  float specular[3] ;
-  float emission[3] ;
-  float shininess ;
+  float ambient[3] = {0, 0, 0};
+  float diffuse[3] = {0, 0, 0};
+  float specular[3] = {0, 0, 0};
+  float emission[3] = {0, 0, 0};
+  float shininess = 0;
 
   in.open(filename); 
   if (in.is_open()) {
@@ -177,10 +178,14 @@ void readfile(const char* filename, Scene& scene)
           if (validinput) {
             triangle = vec3(values[0], values[1], values[2]);
           }
-          Triangle tri(allVertices[values[0]], allVertices[values[1]],
-                       allVertices[values[2]], ambient, diffuse,
-                       specular, emission, shininess);
+          std::shared_ptr<SceneObject> tri =
+            std::make_shared<Triangle>(allVertices[values[0]],
+                                       allVertices[values[1]],
+                                       allVertices[values[2]],
+                                       ambient, diffuse, specular,
+                                       emission, shininess);
           scene.addTriangleToScene(triangle);
+          scene.addObjectToScene(tri);
         } else if (cmd == "sphere") {
           validinput = readvals(s, 4, values);
           std::vector<float> sphere;
@@ -189,9 +194,12 @@ void readfile(const char* filename, Scene& scene)
               sphere.push_back(values[i]);
             }
           }
-          Sphere sphr(values[0], values[1], values[2], values[3],
-                      ambient, diffuse, specular, emission, shininess);
+          std::shared_ptr<SceneObject> sphr =
+            std::make_shared<Sphere>(values[0], values[1], values[2],
+                                     values[3], ambient, diffuse,
+                                     specular, emission, shininess);
           scene.addSphereToScene(sphere);
+          scene.addObjectToScene(sphr);
         }
 
         // Transformations

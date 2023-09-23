@@ -5,9 +5,10 @@
 
 #include <vector>
 #include <string>
+#include <memory>
 #include "Transform.h"
 
-using std::vector, std::string, glm::vec3;
+using std::vector, std::string, std::shared_ptr, glm::vec3;
 
 /**
  * Abstract Base Class for all objects in the Scene
@@ -15,6 +16,11 @@ using std::vector, std::string, glm::vec3;
  */
 class SceneObject {
   public:
+        /**
+        * Print info about object
+        *
+        */
+        virtual void printInfo() = 0;
         /**
         * Test whether the ray defined by `rayDirection`
         * intersects with the object.
@@ -56,6 +62,13 @@ class Scene {
         */
         void setImageResolution(int w, int h);
 
+        /**
+        * Add an object to the scene
+        *
+        * @param sceneObj - Pointer to an object
+        * implementing the SceneObj interface
+        */
+        void addObjectToScene(shared_ptr<SceneObject> sceneObj);
 
         void addVertexToScene(vec3& vertex);
         void addTriangleToScene(vec3& triangle);
@@ -67,6 +80,8 @@ class Scene {
         int width, height; //Image Resolution
 
         // Objects in the scene
+        vector<shared_ptr<SceneObject>> sceneObjects;
+
         vector<vec3> vertices; // Nx3 vertices
         vector<vec3> triangles; // Nx3 triangles
         vector<vector<float>> spheres; // Nx3 spheres
@@ -99,12 +114,18 @@ class Triangle : public SceneObject {
                  float* specular, float* emission,
                  float shininess) :
                 a(a), b(b), c(c),
-                ambient((ambient[0], ambient[1], ambient[2])),
-                diffuse((diffuse[0], diffuse[1], diffuse[2])),
-                specular((specular[0], specular[1], specular[2])),
-                emission((emission[0], emission[1], emission[2])),
+                ambient(vec3(ambient[0], ambient[1], ambient[2])),
+                diffuse(vec3(diffuse[0], diffuse[1], diffuse[2])),
+                specular(vec3(specular[0], specular[1], specular[2])),
+                emission(vec3(emission[0], emission[1], emission[2])),
                 shininess(shininess) {}
+        /**
+        * Print paramters of Triangle
+        *
+        */
+        virtual void printInfo();
         virtual float hitTest(vec3& eye, vec3& rayDirection);
+
   private:
         vec3 a,b,c;
         vec3 ambient, diffuse, specular, emission;
@@ -135,11 +156,16 @@ class Sphere : public SceneObject {
                  float* specular, float* emission,
                  float shininess) :
                 x(x), y(y), z(z), radius(radius),
-                ambient((ambient[0], ambient[1], ambient[2])),
-                diffuse((diffuse[0], diffuse[1], diffuse[2])),
-                specular((specular[0], specular[1], specular[2])),
-                emission((emission[0], emission[1], emission[2])),
+                ambient(vec3(ambient[0], ambient[1], ambient[2])),
+                diffuse(vec3(diffuse[0], diffuse[1], diffuse[2])),
+                specular(vec3(specular[0], specular[1], specular[2])),
+                emission(vec3(emission[0], emission[1], emission[2])),
                 shininess(shininess) {}
+        /**
+        * Print paramters of Sphere
+        *
+        */
+        virtual void printInfo();
         virtual float hitTest(vec3& eye, vec3& rayDirection);
   private:
         float x, y, z, radius;
