@@ -12,7 +12,8 @@ void Raytracer::rayTrace(Scene& scene) {
 
       rayDirection = rayCast(iCenter, jCenter, scene);
       objectIdx = hitTest(scene, rayDirection);
-      if (objectIdx != -1) setRedColor(i, height-j);
+      if (objectIdx != -1)
+        setColor(i, height-j, scene.sceneObjects[objectIdx]);
     }
   }
 }
@@ -45,8 +46,12 @@ int Raytracer::hitTest(Scene& scene, vec3 rayDirection) {
   return intersectObjectIdx;
 }
 
-void Raytracer::setRedColor(int i, int j) {
+void Raytracer::setColor(int i, int j, shared_ptr<SceneObject> object) {
+  auto materialProps = object->getMaterialProperties();
   RGBQUAD color;
+  // color.rgbRed = (int) (materialProps.ambient[0] * 255);
+  // color.rgbGreen = (int) (materialProps.ambient[1] * 255);
+  // color.rgbBlue = (int) (materialProps.ambient[2] * 255);
   color.rgbRed = 255;
   color.rgbGreen = 0;
   color.rgbBlue = 0;

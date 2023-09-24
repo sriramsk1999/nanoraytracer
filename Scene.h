@@ -11,11 +11,31 @@
 using std::vector, std::string, std::shared_ptr, glm::vec3;
 
 /**
+ * Store the various material properties of an object.
+ * Used for lighting the object correctly.
+ *
+ */
+struct materialProperties {
+        vec3 ambient;
+        vec3 diffuse;
+        vec3 specular;
+        vec3 emission;
+        float shininess;
+};
+
+/**
  * Abstract Base Class for all objects in the Scene
  *
  */
 class SceneObject {
   public:
+        /**
+        * Initialize SceneObject
+        * Store material properties in base class
+        *
+        */
+        SceneObject(materialProperties materialProps) :
+                materialProps(materialProps) {}
         /**
         * Print info about object
         *
@@ -30,6 +50,16 @@ class SceneObject {
         * @return Distance of the object from the `eye`.
         */
         virtual float hitTest(vec3& eye, vec3& rayDirection) = 0;
+        /**
+        * Return a reference to the material properties of the object.
+        *
+        * @return const reference to properties of object
+        */
+        const materialProperties& getMaterialProperties() {
+                return materialProps;
+        }
+  protected:
+        materialProperties materialProps;
 };
 
 /**
@@ -95,22 +125,12 @@ class Triangle : public SceneObject {
         * @param a - Triangle vertex (x,y,z)
         * @param b - Triangle vertex (x,y,z)
         * @param c - Triangle vertex (x,y,z)
-        * @param ambient - Ambient color of object (r,g,b)
-        * @param diffuse - Diffuse color of object (r,g,b)
-        * @param specular - Specular color of object (r,g,b)
-        * @param emission - Emissive color of object (r,g,b)
-        * @param shininess - Shininess of object
+        * @param materialProps - Material properties of object, used for lighting.
         */
         Triangle(vec3 a, vec3 b, vec3 c,
-                 float* ambient, float* diffuse,
-                 float* specular, float* emission,
-                 float shininess) :
+                 materialProperties materialProps) :
                 a(a), b(b), c(c),
-                ambient(vec3(ambient[0], ambient[1], ambient[2])),
-                diffuse(vec3(diffuse[0], diffuse[1], diffuse[2])),
-                specular(vec3(specular[0], specular[1], specular[2])),
-                emission(vec3(emission[0], emission[1], emission[2])),
-                shininess(shininess) {}
+                SceneObject(materialProps) {}
         /**
         * Print paramters of Triangle
         *
@@ -127,11 +147,8 @@ class Triangle : public SceneObject {
         * or -1 if ray does not intersect.
         */
         virtual float hitTest(vec3& eye, vec3& rayDirection);
-
   private:
         vec3 a,b,c;
-        vec3 ambient, diffuse, specular, emission;
-        float shininess;
 };
 
 /**
@@ -147,32 +164,21 @@ class Sphere : public SceneObject {
         * @param y - Center of sphere (y coord)
         * @param z - Center of sphere (z coord)
         * @param radius - Radius of sphere
-        * @param ambient - Ambient color of object (r,g,b)
-        * @param diffuse - Diffuse color of object (r,g,b)
-        * @param specular - Specular color of object (r,g,b)
-        * @param emission - Emissive color of object (r,g,b)
-        * @param shininess - Shininess of object
+        * @param materialProps - Material properties of object, used for lighting.
         */
         Sphere(float x, float y, float z, float radius,
-                 float* ambient, float* diffuse,
-                 float* specular, float* emission,
-                 float shininess) :
+               materialProperties materialProps) :
                 x(x), y(y), z(z), radius(radius),
-                ambient(vec3(ambient[0], ambient[1], ambient[2])),
-                diffuse(vec3(diffuse[0], diffuse[1], diffuse[2])),
-                specular(vec3(specular[0], specular[1], specular[2])),
-                emission(vec3(emission[0], emission[1], emission[2])),
-                shininess(shininess) {}
+                SceneObject(materialProps) {}
         /**
         * Print paramters of Sphere
         *
         */
         virtual void printInfo();
         virtual float hitTest(vec3& eye, vec3& rayDirection);
+
   private:
         float x, y, z, radius;
-        vec3 ambient, diffuse, specular, emission;
-        float shininess;
 };
 
 #endif // SCENE_H_

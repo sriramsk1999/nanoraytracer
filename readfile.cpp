@@ -50,6 +50,20 @@ bool readvals(stringstream &s, const int numvals, float* values)
   return true; 
 }
 
+materialProperties initMaterialProperties(float* ambient,
+                                          float* diffuse,
+                                          float* specular,
+                                          float* emission,
+                                          float shininess) {
+  materialProperties materialProps;
+  materialProps.ambient = vec3(ambient[0], ambient[1], ambient[2]);
+  materialProps.diffuse = vec3(diffuse[0], diffuse[1], diffuse[2]);
+  materialProps.specular = vec3(specular[0], specular[1], specular[2]);
+  materialProps.emission = vec3(emission[0], emission[1], emission[2]);
+  materialProps.shininess = shininess;
+  return materialProps;
+}
+
 void readfile(const char* filename, Scene& scene)
 {
   string str, cmd; 
@@ -174,21 +188,29 @@ void readfile(const char* filename, Scene& scene)
         } else if (cmd == "tri") {
           validinput = readvals(s, 3, values);
           if (validinput) {
+            auto materialProps = initMaterialProperties(ambient,
+                                                        diffuse,
+                                                        specular,
+                                                        emission,
+                                                        shininess);
             std::shared_ptr<SceneObject> tri =
               std::make_shared<Triangle>(allVertices[values[0]],
                                         allVertices[values[1]],
                                         allVertices[values[2]],
-                                        ambient, diffuse, specular,
-                                        emission, shininess);
+                                        materialProps);
             scene.addObjectToScene(tri);
           }
         } else if (cmd == "sphere") {
           validinput = readvals(s, 4, values);
           if (validinput) {
+            auto materialProps = initMaterialProperties(ambient,
+                                                        diffuse,
+                                                        specular,
+                                                        emission,
+                                                        shininess);
             std::shared_ptr<SceneObject> sphr =
               std::make_shared<Sphere>(values[0], values[1], values[2],
-                                      values[3], ambient, diffuse,
-                                      specular, emission, shininess);
+                                      values[3], materialProps);
             scene.addObjectToScene(sphr);
           }
         }
