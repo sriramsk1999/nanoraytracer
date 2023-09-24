@@ -1,16 +1,18 @@
 #include "Raytracer.h"
 
+#define Z_FAR 1000000
+
 void Raytracer::rayTrace(Scene& scene) {
   float iCenter, jCenter;
   vec3 rayDirection;
-  bool isIntersect;
+  int objectIdx;
   for (int i=0; i < width; i++) {
     for (int j=0; j < height; j++) {
       iCenter = i+0.5; jCenter = j+0.5; // Ray is cast through center of pixel
 
       rayDirection = rayCast(iCenter, jCenter, scene);
-      isIntersect = checkIntersection(scene, rayDirection);
-      if (isIntersect) setRedColor(i, height-j);
+      objectIdx = hitTest(scene, rayDirection);
+      if (objectIdx != -1) setRedColor(i, height-j);
     }
   }
 }
@@ -29,16 +31,18 @@ vec3 Raytracer::rayCast(float iCenter, float jCenter, Scene& scene) {
   return ray_direction;
 }
 
-bool Raytracer::checkIntersection(Scene& scene, vec3 rayDirection) {
-  vec3 a, b, c, triNorm, hitPoint;
-  float ray2Plane, pointA, pointB, pointC;
-  bool isIntersect = false;
-  float hitDistance;
-  for (auto obj : scene.sceneObjects) {
+int Raytracer::hitTest(Scene& scene, vec3 rayDirection) {
+  float hitDistance, minHitDistance = Z_FAR;
+  int intersectObjectIdx = -1;
+  for (int i = 0; i < scene.sceneObjects.size(); i++) {
+    auto obj = scene.sceneObjects[i];
     hitDistance = obj->hitTest(scene.eye, rayDirection);
-    isIntersect = (bool) (hitDistance) or isIntersect;
+    if (hitDistance > 0 and hitDistance < minHitDistance) {
+      minHitDistance = hitDistance;
+      intersectObjectIdx = i;
+    }
   }
-  return isIntersect;
+  return intersectObjectIdx;
 }
 
 void Raytracer::setRedColor(int i, int j) {

@@ -18,7 +18,7 @@ class Raytracer {
         virtual ~Raytracer();
         void rayTrace(Scene& scene);
         vec3 rayCast(float iCenter, float jCenter, Scene& scene);
-        bool checkIntersection(Scene& scene, vec3 rayDirection);
+        int hitTest(Scene& scene, vec3 rayDirection);
         void setRedColor(int i, int j);
         void saveImage(string fname);
 
