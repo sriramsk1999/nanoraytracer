@@ -168,7 +168,7 @@ class Sphere : public SceneObject {
         */
         Sphere(float x, float y, float z, float radius,
                materialProperties materialProps) :
-                x(x), y(y), z(z), radius(radius),
+                center(vec3(x,y,z)), radius(radius),
                 SceneObject(materialProps) {}
         /**
         * Print paramters of Sphere
@@ -178,7 +178,8 @@ class Sphere : public SceneObject {
         virtual float hitTest(vec3& eye, vec3& rayDirection);
 
   private:
-        float x, y, z, radius;
+        float radius;
+        vec3 center;
 };
 
 #endif // SCENE_H_

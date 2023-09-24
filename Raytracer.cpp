@@ -49,12 +49,9 @@ int Raytracer::hitTest(Scene& scene, vec3 rayDirection) {
 void Raytracer::setColor(int i, int j, shared_ptr<SceneObject> object) {
   auto materialProps = object->getMaterialProperties();
   RGBQUAD color;
-  // color.rgbRed = (int) (materialProps.ambient[0] * 255);
-  // color.rgbGreen = (int) (materialProps.ambient[1] * 255);
-  // color.rgbBlue = (int) (materialProps.ambient[2] * 255);
-  color.rgbRed = 255;
-  color.rgbGreen = 0;
-  color.rgbBlue = 0;
+  color.rgbRed = (int) (materialProps.ambient[0] * 255);
+  color.rgbGreen = (int) (materialProps.ambient[1] * 255);
+  color.rgbBlue = (int) (materialProps.ambient[2] * 255);
   FreeImage_SetPixelColor(image, i, j, &color);
 }
 
