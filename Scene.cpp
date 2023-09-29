@@ -32,6 +32,10 @@ void Triangle::printInfo() {
     Vertex A: " << a[0] << " " << a[1] << " " << a[2] << "\n\
     Vertex B: " << b[0] << " " << b[1] << " " << b[2] << "\n\
     Vertex C: " << c[0] << " " << c[1] << " " << c[2] << "\n\
+    Transform Row1: " << transform[0][0] << " " << transform[1][0] << " " << transform[2][0] << " " << transform[3][0] << "\n\
+    Transform Row2: " << transform[0][1] << " " << transform[1][1] << " " << transform[2][1] << " " << transform[3][1] << "\n\
+    Transform Row3: " << transform[0][2] << " " << transform[1][2] << " " << transform[2][2] << " " << transform[3][2] << "\n\
+    Transform Row4: " << transform[0][3] << " " << transform[1][3] << " " << transform[2][3] << " " << transform[3][3] << "\n\
     Ambient: " << materialProps.ambient[0] << " " << materialProps.ambient[1] << " " << materialProps.ambient[2] << "\n\
     Diffuse: " << materialProps.diffuse[0] << " " << materialProps.diffuse[1] << " " << materialProps.diffuse[2] << "\n\
     Specular: " << materialProps.specular[0] << " " << materialProps.specular[1] << " " << materialProps.specular[2] << "\n\
@@ -68,6 +72,10 @@ void Sphere::printInfo() {
     "Object Type : Sphere\n\
     Center: " << center[0] << " " << center[1] << " " << center[2] << "\n\
     Radius: " << radius << "\n\
+    Transform Row1: " << transform[0][0] << " " << transform[1][0] << " " << transform[2][0] << " " << transform[3][0] << "\n\
+    Transform Row2: " << transform[0][1] << " " << transform[1][1] << " " << transform[2][1] << " " << transform[3][1] << "\n\
+    Transform Row3: " << transform[0][2] << " " << transform[1][2] << " " << transform[2][2] << " " << transform[3][2] << "\n\
+    Transform Row4: " << transform[0][3] << " " << transform[1][3] << " " << transform[2][3] << " " << transform[3][3] << "\n\
     Ambient: " << materialProps.ambient[0] << " " << materialProps.ambient[1] << " " << materialProps.ambient[2] << "\n\
     Diffuse: " << materialProps.diffuse[0] << " " << materialProps.diffuse[1] << " " << materialProps.diffuse[2] << "\n\
     Specular: " << materialProps.specular[0] << " " << materialProps.specular[1] << " " << materialProps.specular[2] << "\n\

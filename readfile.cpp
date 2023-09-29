@@ -197,7 +197,8 @@ void readfile(const char* filename, Scene& scene)
               std::make_shared<Triangle>(allVertices[values[0]],
                                         allVertices[values[1]],
                                         allVertices[values[2]],
-                                        materialProps);
+                                        materialProps,
+                                        transfstack.top());
             scene.addObjectToScene(tri);
           }
         } else if (cmd == "sphere") {
@@ -210,7 +211,8 @@ void readfile(const char* filename, Scene& scene)
                                                         shininess);
             std::shared_ptr<SceneObject> sphr =
               std::make_shared<Sphere>(values[0], values[1], values[2],
-                                      values[3], materialProps);
+                                       values[3], materialProps,
+                                       transfstack.top());
             scene.addObjectToScene(sphr);
           }
         }

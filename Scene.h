@@ -31,11 +31,12 @@ class SceneObject {
   public:
         /**
         * Initialize SceneObject
-        * Store material properties in base class
+        * @param materialProps - Store material properties in base class
+        * @param transform - Transform to be applied to object
         *
         */
-        SceneObject(materialProperties materialProps) :
-                materialProps(materialProps) {}
+        SceneObject(materialProperties materialProps, mat4 transform) :
+                materialProps(materialProps), transform(transform) {}
         /**
         * Print info about object
         *
@@ -60,6 +61,7 @@ class SceneObject {
         }
   protected:
         materialProperties materialProps;
+        mat4 transform;
 };
 
 /**
@@ -97,6 +99,8 @@ class Scene {
         *
         * @param sceneObj - Pointer to an object
         * implementing the SceneObj interface
+        * @param transform - Transformation matrix to be
+        * applied to the object. Identity by default
         */
         void addObjectToScene(shared_ptr<SceneObject> sceneObj);
 
@@ -126,11 +130,13 @@ class Triangle : public SceneObject {
         * @param b - Triangle vertex (x,y,z)
         * @param c - Triangle vertex (x,y,z)
         * @param materialProps - Material properties of object, used for lighting.
+        * @param transform - 4x4 transform to be applied to object
         */
         Triangle(vec3 a, vec3 b, vec3 c,
-                 materialProperties materialProps) :
+                 materialProperties materialProps,
+                 mat4 transform = mat4(1.0)) :
                 a(a), b(b), c(c),
-                SceneObject(materialProps) {}
+                SceneObject(materialProps, transform) {}
         /**
         * Print paramters of Triangle
         *
@@ -165,11 +171,13 @@ class Sphere : public SceneObject {
         * @param z - Center of sphere (z coord)
         * @param radius - Radius of sphere
         * @param materialProps - Material properties of object, used for lighting.
+        * @param transform - 4x4 transform to be applied to object
         */
         Sphere(float x, float y, float z, float radius,
-               materialProperties materialProps) :
+               materialProperties materialProps,
+               mat4 transform = mat4(1.0)) :
                 center(vec3(x,y,z)), radius(radius),
-                SceneObject(materialProps) {}
+                SceneObject(materialProps, transform) {}
         /**
         * Print paramters of Sphere
         *
