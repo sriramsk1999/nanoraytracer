@@ -59,6 +59,24 @@ class SceneObject {
         const materialProperties& getMaterialProperties() {
                 return materialProps;
         }
+
+        /**
+        * Instead of applying the transform to the object
+        * and checking for intersection, apply the inverse
+        * transform to the ray. This function returns the
+        * new ray params (eye and ray direction) after applying
+        * inverse transform.
+        *
+        * @param eye - eye vector from which ray is cast
+        * @param rayDirection - direction in which ray is cast
+        * @return eye, rayDirection after appplying inverse object transforms
+        */
+        std::pair<vec3, vec3> getTransformedRay(vec3& eye, vec3& rayDirection) {
+                mat4 invTransform = inverse(transform);
+                vec3 transEye = vec3(invTransform * vec4(eye, 1.0));
+                vec3 transDirection = normalize(vec3(invTransform * vec4(rayDirection, 0.0)));
+                return std::make_pair(transEye, transDirection);
+        }
   protected:
         materialProperties materialProps;
         mat4 transform;
