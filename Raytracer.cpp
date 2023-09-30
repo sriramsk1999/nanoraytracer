@@ -14,7 +14,7 @@ void Raytracer::rayTrace(Scene& scene) {
       // Get the id of the object being hit by the ray
       objectIdx = hitTest(scene, rayDirection);
       if (objectIdx != -1)
-        setColor(i, height-j, scene.sceneObjects[objectIdx]);
+        setColor(i, height-j, objectIdx, scene);
     }
   }
 }
@@ -50,12 +50,25 @@ int Raytracer::hitTest(Scene& scene, vec3 rayDirection) {
   return intersectObjectIdx;
 }
 
-void Raytracer::setColor(int i, int j, shared_ptr<SceneObject> object) {
-  auto materialProps = object->getMaterialProperties();
+void Raytracer::setColor(int i, int j, int objectIdx,
+                         Scene& scene) {
+  auto materialProps = scene.sceneObjects[objectIdx]->getMaterialProperties();
+
+  vec3 rgb;
+  rgb = materialProps.ambient + materialProps.emission;
+  for (int lightIdx = 0; lightIdx < scene.directionalLights.size(); lightIdx++) {
+    ;
+  }
+  for (int lightIdx = 0; lightIdx < scene.pointLights.size(); lightIdx++) {
+    ;
+  }
+  rgb = rgb * 255.0f;
+
   RGBQUAD color;
-  color.rgbRed = (int) (materialProps.ambient[0] * 255);
-  color.rgbGreen = (int) (materialProps.ambient[1] * 255);
-  color.rgbBlue = (int) (materialProps.ambient[2] * 255);
+  color.rgbRed = rgb[0];
+  color.rgbGreen = rgb[1];
+  color.rgbBlue = rgb[2];
+
   FreeImage_SetPixelColor(image, i, j, &color);
 }
 

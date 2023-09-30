@@ -54,9 +54,11 @@ class Raytracer {
         *
         * @param i - Pixel coord
         * @param j - Pixel coord
-        * @param object - The object located at this pixel
+        * @param objectIdx - id of the object hit by ray
+        * @param scene - Object describing the composition of the scene
         */
-        void setColor(int i, int j, shared_ptr<SceneObject> object);
+        void setColor(int i, int j, int objectIdx,
+                      Scene& scene);
         /**
         * Save the output image after raytracing
         *
