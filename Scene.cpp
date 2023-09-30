@@ -44,12 +44,16 @@ void Triangle::printInfo() {
 }
 
 float Triangle::hitTest(vec3& eye, vec3& rayDirection) {
+  mat4 invTransform = inverse(transform);
+  vec3 invEye = vec3(invTransform * vec4(eye, 1.0));
+  vec3 invDirection = normalize(vec3(invTransform * vec4(rayDirection, 0.0)));
+
   vec3 triNorm = normalize( cross(c-a, b-a) );
   vec3 hitPoint, pointA, pointB, pointC;
   float ray2Plane, hitDistance=0.;
 
-  ray2Plane = ( dot(a, triNorm) - dot(eye, triNorm) ) / dot( rayDirection, triNorm );
-  hitPoint = eye + rayDirection*ray2Plane;
+  ray2Plane = ( dot(a, triNorm) - dot(invEye, triNorm) ) / dot( invDirection, triNorm );
+  hitPoint = invEye + invDirection*ray2Plane;
 
   pointA = cross(b-a, hitPoint-a);
   pointB = cross(c-b, hitPoint-b);
@@ -84,21 +88,31 @@ void Sphere::printInfo() {
 }
 
 float Sphere::hitTest(vec3& eye, vec3& rayDirection) {
+  mat4 invTransform = inverse(transform);
+  vec3 invEye = vec3(invTransform * vec4(eye, 1.0));
+  vec3 invDirection = normalize(vec3(invTransform * vec4(rayDirection, 0.0)));
+
   // Define the coefficients of the quadratic equation to be solved.
+  vec3 hitPoint;
   float a, b, c, hitDistance;
   float root1, root2, discriminant;
-  a = dot(rayDirection, rayDirection);
-  b = 2 * dot(rayDirection, eye-center);
-  c = dot(eye-center, eye-center) - radius*radius;
+
+  a = dot(invDirection, invDirection);
+  b = 2 * dot(invDirection, invEye-center);
+  c = dot(invEye-center, invEye-center) - radius*radius;
   discriminant = b*b - 4*a*c;
   if (discriminant < 0) hitDistance = -1; //no intersection
   else {
     // pick smaller positive root
-    root1 = (-b + pow(discriminant, 0.5))/2*a;
-    root2 = (-b - pow(discriminant, 0.5))/2*a;
+    root1 = (-b + pow(discriminant, 0.5))/(2*a);
+    root2 = (-b - pow(discriminant, 0.5))/(2*a);
 
     if (root1 < root2 and root1 > 0) hitDistance = root1;
     else hitDistance = root2;
+
+    hitPoint = invEye + invDirection*hitDistance;
+    hitPoint = vec3(transform * vec4(hitPoint, 1.0));
+    hitDistance = length(eye-hitPoint);
   }
   return hitDistance;
 }
