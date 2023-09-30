@@ -8,9 +8,10 @@ void Raytracer::rayTrace(Scene& scene) {
   int objectIdx;
   for (int i=0; i < width; i++) {
     for (int j=0; j < height; j++) {
-      iCenter = i+0.5; jCenter = j+0.5; // Ray is cast through center of pixel
-
+      // Convention: Ray is cast through center of pixel
+      iCenter = i+0.5; jCenter = j+0.5;
       rayDirection = rayCast(iCenter, jCenter, scene);
+      // Get the id of the object being hit by the ray
       objectIdx = hitTest(scene, rayDirection);
       if (objectIdx != -1)
         setColor(i, height-j, scene.sceneObjects[objectIdx]);
@@ -24,6 +25,7 @@ vec3 Raytracer::rayCast(float iCenter, float jCenter, Scene& scene) {
   alpha = tan( (scene.fieldOfViewX / 2) ) * (iCenter - (scene.width/2))/(scene.width/2);
   beta = tan( (scene.fieldOfViewY / 2) ) * ((scene.height/2) - jCenter)/(scene.height/2);
 
+  // Construct coordinate frame based on eye and up vector
   vec3 w_vec = normalize(scene.eye-scene.center);
   vec3 u_vec = normalize(cross(scene.up, w_vec));
   vec3 v_vec = cross(w_vec, u_vec);
@@ -35,6 +37,8 @@ vec3 Raytracer::rayCast(float iCenter, float jCenter, Scene& scene) {
 int Raytracer::hitTest(Scene& scene, vec3 rayDirection) {
   float hitDistance, minHitDistance = Z_FAR;
   int intersectObjectIdx = -1;
+  // Iterate over objects in scene
+  // Find the object first hit by the ray i.e. minimum hit distance
   for (int i = 0; i < scene.sceneObjects.size(); i++) {
     auto obj = scene.sceneObjects[i];
     hitDistance = obj->hitTest(scene.eye, rayDirection);
