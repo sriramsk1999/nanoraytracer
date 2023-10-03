@@ -72,7 +72,7 @@ pair<float, vec3> Triangle::hitTest(vec3& eye, vec3& rayDirection) {
 }
 
 vec3 Triangle::getNorm(vec3 hitPoint) {
-  return normalize( cross (c-a, b-a));
+  return normalize( cross (b-a, c-a));
 }
 
 void Sphere::printInfo() {

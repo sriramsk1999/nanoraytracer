@@ -65,47 +65,39 @@ void Raytracer::setColor(int i, int j, int objectIdx, vec3 hitPoint,
   vec3 directionToEye = normalize(scene.eye - hitPoint);
   vec3 RGB, lightRGB, lightXYZ, directionToLight, halfVector;
   vec3 diffuseLight, specularLight;
-  vec3 pointLightAttenuationCoeff(0,0,1);
-  vec3 directionalLightAttenuationCoeff(1,0,0);
+  vec3 defaultLightAttenuationCoeff(1,0,0);
   float distanceToLight;
   RGB = materialProps.ambient + materialProps.emission;
+
   for (int lightIdx = 0; lightIdx < scene.pointLights.size(); lightIdx++) {
-    lightRGB = vec3(scene.pointLights[lightIdx][0], scene.pointLights[lightIdx][1], scene.pointLights[lightIdx][2]);
-    lightXYZ = vec3(scene.pointLights[lightIdx][3], scene.pointLights[lightIdx][4], scene.pointLights[lightIdx][5]);
+    lightXYZ = vec3(scene.pointLights[lightIdx][0], scene.pointLights[lightIdx][1], scene.pointLights[lightIdx][2]);
+    lightRGB = vec3(scene.pointLights[lightIdx][3], scene.pointLights[lightIdx][4], scene.pointLights[lightIdx][5]);
     directionToLight = normalize(lightXYZ - hitPoint);
     distanceToLight = length(lightXYZ - hitPoint);
-    lightRGB = lightRGB/(pointLightAttenuationCoeff[0] +
-                         pointLightAttenuationCoeff[1]*distanceToLight +
-                         pointLightAttenuationCoeff[2]*distanceToLight*distanceToLight
+    lightRGB = lightRGB/(defaultLightAttenuationCoeff[0] +
+                         defaultLightAttenuationCoeff[1]*distanceToLight +
+                         defaultLightAttenuationCoeff[2]*distanceToLight*distanceToLight
                          );
     halfVector = normalize (directionToLight + directionToEye);
     diffuseLight = materialProps.diffuse * max( dot(objectNormal, directionToLight), 0.0f);
     specularLight = materialProps.specular * (float) pow(max( dot(objectNormal, halfVector), 0.0f), materialProps.shininess);
-    std::cout << "directionToLight: " << directionToLight[0] << " " << directionToLight[1] << " " << directionToLight[2] << "\n";
-    std::cout << "diffuseangle: " << dot(objectNormal, directionToLight) << "\n";
-    // std::cout << "diffuse: " << diffuseLight[0] << " " << diffuseLight[1] << " " << diffuseLight[2] << "\n";
-    // std::cout << "specularprops: " << materialProps.specular[0] << " " << materialProps.specular[1] << " " << materialProps.specular[2] << "\n";
-    // std::cout << "specular: " << specularLight[0] << " " << specularLight[1] << " " << specularLight[2] << "\n";
     RGB += lightRGB*(diffuseLight + specularLight);
   }
+
   for (int lightIdx = 0; lightIdx < scene.directionalLights.size(); lightIdx++) {
-    lightRGB = vec3(scene.directionalLights[lightIdx][0], scene.directionalLights[lightIdx][1], scene.directionalLights[lightIdx][2]);
-    lightXYZ = vec3(scene.directionalLights[lightIdx][3], scene.directionalLights[lightIdx][4], scene.directionalLights[lightIdx][5]);
+    lightXYZ = vec3(scene.directionalLights[lightIdx][0], scene.directionalLights[lightIdx][1], scene.directionalLights[lightIdx][2]);
+    lightRGB = vec3(scene.directionalLights[lightIdx][3], scene.directionalLights[lightIdx][4], scene.directionalLights[lightIdx][5]);
     directionToLight = normalize(lightXYZ);
     distanceToLight = -1.;
-    lightRGB = lightRGB/(directionalLightAttenuationCoeff[0] +
-                         directionalLightAttenuationCoeff[1]*distanceToLight +
-                         directionalLightAttenuationCoeff[2]*distanceToLight*distanceToLight
+    lightRGB = lightRGB/(defaultLightAttenuationCoeff[0] +
+                         defaultLightAttenuationCoeff[1]*distanceToLight +
+                         defaultLightAttenuationCoeff[2]*distanceToLight*distanceToLight
                          );
     halfVector = normalize (directionToLight + directionToEye);
     diffuseLight = materialProps.diffuse * max( dot(objectNormal, directionToLight), 0.0f);
     specularLight = materialProps.specular * (float) pow(max( dot(objectNormal, halfVector), 0.0f), materialProps.shininess);
-    // std::cout << "diffuse: " << diffuseLight[0] << " " << diffuseLight[1] << " " << diffuseLight[2] << "\n";
-    // std::cout << "specular: " << specularLight[0] << " " << specularLight[1] << " " << specularLight[2] << "\n";
     RGB += lightRGB*(diffuseLight + specularLight);
   }
-  std::cout << "RGB: " << RGB[0] << " " << RGB[1] << " " << RGB[2] << "\n";
-  std::cout << "----\n";
   RGB = RGB * 255.0f;
 
   RGBQUAD color;

@@ -79,7 +79,7 @@ void readfile(const char* filename, Scene& scene)
   float diffuse[3] = {0, 0, 0};
   float specular[3] = {0, 0, 0};
   float emission[3] = {0, 0, 0};
-  float shininess = 0;
+  float shininess = 1;
 
   in.open(filename); 
   if (in.is_open()) {
