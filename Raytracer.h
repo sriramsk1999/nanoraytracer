@@ -10,7 +10,7 @@
 #include "Transform.h"
 #include "Scene.h"
 
-using std::vector, std::string, std::shared_ptr, glm::vec3;
+using std::vector, std::string, std::shared_ptr, std::max, glm::vec3;
 
 /**
  * Class to instantiate a RayTracer to render a given scene
@@ -48,7 +48,7 @@ class Raytracer {
         * @param rayDirection - Direction of the ray being cast
         * @return id of the object being hit, -1 if no object
         */
-        int hitTest(Scene& scene, vec3 rayDirection);
+        pair<int, vec3> hitTest(Scene& scene, vec3 rayDirection);
         /**
         * Set the colour of a pixel based on the object struck by it
         *
@@ -57,7 +57,7 @@ class Raytracer {
         * @param objectIdx - id of the object hit by ray
         * @param scene - Object describing the composition of the scene
         */
-        void setColor(int i, int j, int objectIdx,
+        void setColor(int i, int j, int objectIdx, vec3 hitPoint,
                       Scene& scene);
         /**
         * Save the output image after raytracing

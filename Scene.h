@@ -8,7 +8,8 @@
 #include <memory>
 #include "Transform.h"
 
-using std::vector, std::string, std::shared_ptr, glm::vec3;
+using std::vector, std::string, std::pair, std::make_pair,
+        std::shared_ptr, glm::vec3;
 
 /**
  * Store the various material properties of an object.
@@ -50,7 +51,10 @@ class SceneObject {
         * @param rayDirection - The direction of the ray being cast.
         * @return Distance of the object from the `eye`.
         */
-        virtual float hitTest(vec3& eye, vec3& rayDirection) = 0;
+        virtual pair<float, vec3> hitTest(vec3& eye, vec3& rayDirection) = 0;
+
+        virtual vec3 getNorm(vec3 hitPoint) = 0;
+
         /**
         * Return a reference to the material properties of the object.
         *
@@ -160,6 +164,8 @@ class Triangle : public SceneObject {
         *
         */
         virtual void printInfo();
+
+        virtual vec3 getNorm(vec3 hitPoint = vec3(0,0,0));
         /**
         * Perform hit test on triangle.
         * Check if the ray cast from eye
@@ -170,7 +176,7 @@ class Triangle : public SceneObject {
         * @return Returns the distance from the eye to the triangle,
         * or -1 if ray does not intersect.
         */
-        virtual float hitTest(vec3& eye, vec3& rayDirection);
+        virtual pair<float, vec3> hitTest(vec3& eye, vec3& rayDirection);
   private:
         vec3 a,b,c;
 };
@@ -201,7 +207,10 @@ class Sphere : public SceneObject {
         *
         */
         virtual void printInfo();
-        virtual float hitTest(vec3& eye, vec3& rayDirection);
+
+        virtual vec3 getNorm(vec3 hitPoint);
+
+        virtual pair<float, vec3> hitTest(vec3& eye, vec3& rayDirection);
 
   private:
         float radius;

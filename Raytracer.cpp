@@ -1,10 +1,11 @@
 #include "Raytracer.h"
+#include <iostream>
 
 #define Z_FAR 1000000
 
 void Raytracer::rayTrace(Scene& scene) {
   float iCenter, jCenter;
-  vec3 rayDirection;
+  vec3 rayDirection, hitPoint;
   int objectIdx;
   for (int i=0; i < width; i++) {
     for (int j=0; j < height; j++) {
@@ -12,9 +13,11 @@ void Raytracer::rayTrace(Scene& scene) {
       iCenter = i+0.5; jCenter = j+0.5;
       rayDirection = rayCast(iCenter, jCenter, scene);
       // Get the id of the object being hit by the ray
-      objectIdx = hitTest(scene, rayDirection);
+      auto hitResults = hitTest(scene, rayDirection);
+      objectIdx = hitResults.first;
+      hitPoint = hitResults.second;
       if (objectIdx != -1)
-        setColor(i, height-j, objectIdx, scene);
+        setColor(i, height-j, objectIdx, hitPoint, scene);
     }
   }
 }
@@ -34,40 +37,81 @@ vec3 Raytracer::rayCast(float iCenter, float jCenter, Scene& scene) {
   return ray_direction;
 }
 
-int Raytracer::hitTest(Scene& scene, vec3 rayDirection) {
+pair<int, vec3> Raytracer::hitTest(Scene& scene, vec3 rayDirection) {
   float hitDistance, minHitDistance = Z_FAR;
+  vec3 hitPoint(0,0,0);
   int intersectObjectIdx = -1;
   // Iterate over objects in scene
   // Find the object first hit by the ray i.e. minimum hit distance
   for (int i = 0; i < scene.sceneObjects.size(); i++) {
     auto obj = scene.sceneObjects[i];
-    hitDistance = obj->hitTest(scene.eye, rayDirection);
+    auto objHitResults = obj->hitTest(scene.eye, rayDirection);
+    hitDistance = objHitResults.first;
     if (hitDistance > 0 and hitDistance < minHitDistance) {
       minHitDistance = hitDistance;
+      hitPoint = objHitResults.second;
       intersectObjectIdx = i;
     }
   }
-  return intersectObjectIdx;
+  return make_pair(intersectObjectIdx, hitPoint);
 }
 
-void Raytracer::setColor(int i, int j, int objectIdx,
+void Raytracer::setColor(int i, int j, int objectIdx, vec3 hitPoint,
                          Scene& scene) {
-  auto materialProps = scene.sceneObjects[objectIdx]->getMaterialProperties();
+  auto object = scene.sceneObjects[objectIdx];
+  materialProperties materialProps = object->getMaterialProperties();
+  vec3 objectNormal = object->getNorm(hitPoint);
 
-  vec3 rgb;
-  rgb = materialProps.ambient + materialProps.emission;
-  for (int lightIdx = 0; lightIdx < scene.directionalLights.size(); lightIdx++) {
-    ;
-  }
+  vec3 directionToEye = normalize(scene.eye - hitPoint);
+  vec3 RGB, lightRGB, lightXYZ, directionToLight, halfVector;
+  vec3 diffuseLight, specularLight;
+  vec3 pointLightAttenuationCoeff(0,0,1);
+  vec3 directionalLightAttenuationCoeff(1,0,0);
+  float distanceToLight;
+  RGB = materialProps.ambient + materialProps.emission;
   for (int lightIdx = 0; lightIdx < scene.pointLights.size(); lightIdx++) {
-    ;
+    lightRGB = vec3(scene.pointLights[lightIdx][0], scene.pointLights[lightIdx][1], scene.pointLights[lightIdx][2]);
+    lightXYZ = vec3(scene.pointLights[lightIdx][3], scene.pointLights[lightIdx][4], scene.pointLights[lightIdx][5]);
+    directionToLight = normalize(lightXYZ - hitPoint);
+    distanceToLight = length(lightXYZ - hitPoint);
+    lightRGB = lightRGB/(pointLightAttenuationCoeff[0] +
+                         pointLightAttenuationCoeff[1]*distanceToLight +
+                         pointLightAttenuationCoeff[2]*distanceToLight*distanceToLight
+                         );
+    halfVector = normalize (directionToLight + directionToEye);
+    diffuseLight = materialProps.diffuse * max( dot(objectNormal, directionToLight), 0.0f);
+    specularLight = materialProps.specular * (float) pow(max( dot(objectNormal, halfVector), 0.0f), materialProps.shininess);
+    std::cout << "directionToLight: " << directionToLight[0] << " " << directionToLight[1] << " " << directionToLight[2] << "\n";
+    std::cout << "diffuseangle: " << dot(objectNormal, directionToLight) << "\n";
+    // std::cout << "diffuse: " << diffuseLight[0] << " " << diffuseLight[1] << " " << diffuseLight[2] << "\n";
+    // std::cout << "specularprops: " << materialProps.specular[0] << " " << materialProps.specular[1] << " " << materialProps.specular[2] << "\n";
+    // std::cout << "specular: " << specularLight[0] << " " << specularLight[1] << " " << specularLight[2] << "\n";
+    RGB += lightRGB*(diffuseLight + specularLight);
   }
-  rgb = rgb * 255.0f;
+  for (int lightIdx = 0; lightIdx < scene.directionalLights.size(); lightIdx++) {
+    lightRGB = vec3(scene.directionalLights[lightIdx][0], scene.directionalLights[lightIdx][1], scene.directionalLights[lightIdx][2]);
+    lightXYZ = vec3(scene.directionalLights[lightIdx][3], scene.directionalLights[lightIdx][4], scene.directionalLights[lightIdx][5]);
+    directionToLight = normalize(lightXYZ);
+    distanceToLight = -1.;
+    lightRGB = lightRGB/(directionalLightAttenuationCoeff[0] +
+                         directionalLightAttenuationCoeff[1]*distanceToLight +
+                         directionalLightAttenuationCoeff[2]*distanceToLight*distanceToLight
+                         );
+    halfVector = normalize (directionToLight + directionToEye);
+    diffuseLight = materialProps.diffuse * max( dot(objectNormal, directionToLight), 0.0f);
+    specularLight = materialProps.specular * (float) pow(max( dot(objectNormal, halfVector), 0.0f), materialProps.shininess);
+    // std::cout << "diffuse: " << diffuseLight[0] << " " << diffuseLight[1] << " " << diffuseLight[2] << "\n";
+    // std::cout << "specular: " << specularLight[0] << " " << specularLight[1] << " " << specularLight[2] << "\n";
+    RGB += lightRGB*(diffuseLight + specularLight);
+  }
+  std::cout << "RGB: " << RGB[0] << " " << RGB[1] << " " << RGB[2] << "\n";
+  std::cout << "----\n";
+  RGB = RGB * 255.0f;
 
   RGBQUAD color;
-  color.rgbRed = rgb[0];
-  color.rgbGreen = rgb[1];
-  color.rgbBlue = rgb[2];
+  color.rgbRed = RGB[0];
+  color.rgbGreen = RGB[1];
+  color.rgbBlue = RGB[2];
 
   FreeImage_SetPixelColor(image, i, j, &color);
 }

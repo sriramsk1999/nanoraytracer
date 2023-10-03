@@ -43,13 +43,13 @@ void Triangle::printInfo() {
     Shininess: " << materialProps.shininess << "\n";
 }
 
-float Triangle::hitTest(vec3& eye, vec3& rayDirection) {
+pair<float, vec3> Triangle::hitTest(vec3& eye, vec3& rayDirection) {
   vec3 hitPoint, pointA, pointB, pointC;
   float ray2Plane, hitDistance=0.;
   auto transformedRay = getTransformedRay(eye, rayDirection);
   vec3 transEye = transformedRay.first;
   vec3 transDirection = transformedRay.second;
-  vec3 triNorm = normalize( cross(c-a, b-a) );
+  vec3 triNorm = getNorm();
 
   // Find distance between ray and plane
   ray2Plane = ( dot(a, triNorm) - dot(transEye, triNorm) ) / dot( transDirection, triNorm );
@@ -68,7 +68,11 @@ float Triangle::hitTest(vec3& eye, vec3& rayDirection) {
     hitDistance = ray2Plane;
   }
   else hitDistance = -1; // Does not intersect triangle
-  return hitDistance;
+  return make_pair(hitDistance, hitPoint);
+}
+
+vec3 Triangle::getNorm(vec3 hitPoint) {
+  return normalize( cross (c-a, b-a));
 }
 
 void Sphere::printInfo() {
@@ -87,7 +91,7 @@ void Sphere::printInfo() {
     Shininess: " << materialProps.shininess << "\n";
 }
 
-float Sphere::hitTest(vec3& eye, vec3& rayDirection) {
+pair<float, vec3> Sphere::hitTest(vec3& eye, vec3& rayDirection) {
   auto transformedRay = getTransformedRay(eye, rayDirection);
   vec3 transEye = transformedRay.first;
   vec3 transDirection = transformedRay.second;
@@ -114,5 +118,9 @@ float Sphere::hitTest(vec3& eye, vec3& rayDirection) {
     hitPoint = vec3(transform * vec4(hitPoint, 1.0));
     hitDistance = length(eye-hitPoint);
   }
-  return hitDistance;
+  return make_pair(hitDistance, hitPoint);
+}
+
+vec3 Sphere::getNorm(vec3 hitPoint) {
+  return normalize(hitPoint - center);
 }
