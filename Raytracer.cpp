@@ -56,24 +56,39 @@ pair<int, vec3> Raytracer::hitTest(Scene& scene, vec3 rayDirection) {
   return make_pair(intersectObjectIdx, hitPoint);
 }
 
+bool Raytracer::hitTest(Scene& scene, vec3 source, vec3 destination) {
+  // arbitrary hitTest from source to destination
+
+  vec3 rayDirection = normalize(destination-source);
+  float epsilon = 0.001;
+  bool hitsObject = false;
+  // move hitpoint towards light to avoid boundary issues
+  source = source + epsilon*rayDirection;
+  for (auto obj : scene.sceneObjects) {
+    auto objHitResults = obj->hitTest(source, rayDirection);
+    float hitDistance = objHitResults.first;
+    if (hitDistance > 0) {
+      hitsObject=true;
+    }
+  }
+  return hitsObject;
+}
+
 void Raytracer::setColor(int i, int j, int objectIdx, vec3 hitPoint,
                          Scene& scene) {
   auto object = scene.sceneObjects[objectIdx];
   materialProperties materialProps = object->getMaterialProperties();
   vec3 objectNormal = object->getNorm(hitPoint);
-
   vec3 directionToEye = normalize(scene.eye - hitPoint);
-  vec3 RGB, lightRGB, lightXYZ, directionToLight, halfVector;
-  vec3 diffuseLight, specularLight;
-  vec3 defaultLightAttenuationCoeff(1,0,0);
-  float distanceToLight;
-  RGB = materialProps.ambient + materialProps.emission;
+  bool isOccluded;
 
+  vec3 RGB = materialProps.ambient + materialProps.emission;
   for (auto l : scene.lights) {
-    RGB += l->computeLight(hitPoint, directionToEye, materialProps.diffuse, materialProps.specular,
-                           materialProps.shininess, objectNormal);
+    isOccluded = hitTest(scene, hitPoint, l->getLightPosition());
+    if (not(isOccluded))
+      RGB += l->computeLight(hitPoint, directionToEye, materialProps.diffuse, materialProps.specular,
+                            materialProps.shininess, objectNormal);
   }
-
   RGB = RGB * 255.0f;
   RGB = glm::clamp(RGB, 0.f, 255.0f);
 

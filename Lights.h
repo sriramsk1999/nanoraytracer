@@ -16,6 +16,7 @@ class LightSource {
                           vec3 diffuse, vec3 specular, float shininess,
                           vec3 objectNormal) = 0;
         virtual void printInfo() = 0;
+        virtual vec3 getLightPosition() = 0;
 };
 
 /**
@@ -32,6 +33,7 @@ class PointLight : public LightSource {
                           vec3 diffuse, vec3 specular, float shininess,
                           vec3 objectNormal);
         void printInfo();
+        vec3 getLightPosition() {return xyz;}
   private:
         vec3 xyz, rgb;
 };
@@ -49,6 +51,7 @@ class DirectionalLight : public LightSource {
                           vec3 diffuse, vec3 specular, float shininess,
                           vec3 objectNormal);
         void printInfo();
+        vec3 getLightPosition() {return xyz;}
   private:
         vec3 xyz, rgb;
 };

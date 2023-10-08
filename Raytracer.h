@@ -50,6 +50,14 @@ class Raytracer {
         */
         pair<int, vec3> hitTest(Scene& scene, vec3 rayDirection);
         /**
+        * Check if a ray intersects with the objects in the scene
+        *
+        * @param scene - Object describing the composition of the scene
+        * @param rayDirection - Direction of the ray being cast
+        * @return id of the object being hit, -1 if no object
+        */
+        bool hitTest(Scene& scene, vec3 source, vec3 destination);
+        /**
         * Set the colour of a pixel based on the object struck by it
         *
         * @param i - Pixel coord
