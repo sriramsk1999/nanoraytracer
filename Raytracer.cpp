@@ -69,36 +69,13 @@ void Raytracer::setColor(int i, int j, int objectIdx, vec3 hitPoint,
   float distanceToLight;
   RGB = materialProps.ambient + materialProps.emission;
 
-  for (int lightIdx = 0; lightIdx < scene.pointLights.size(); lightIdx++) {
-    lightXYZ = vec3(scene.pointLights[lightIdx][0], scene.pointLights[lightIdx][1], scene.pointLights[lightIdx][2]);
-    lightRGB = vec3(scene.pointLights[lightIdx][3], scene.pointLights[lightIdx][4], scene.pointLights[lightIdx][5]);
-    directionToLight = normalize(lightXYZ - hitPoint);
-    distanceToLight = length(lightXYZ - hitPoint);
-    lightRGB = lightRGB/(defaultLightAttenuationCoeff[0] +
-                         defaultLightAttenuationCoeff[1]*distanceToLight +
-                         defaultLightAttenuationCoeff[2]*distanceToLight*distanceToLight
-                         );
-    halfVector = normalize (directionToLight + directionToEye);
-    diffuseLight = materialProps.diffuse * max( dot(objectNormal, directionToLight), 0.0f);
-    specularLight = materialProps.specular * (float) pow(max( dot(objectNormal, halfVector), 0.0f), materialProps.shininess);
-    RGB += lightRGB*(diffuseLight + specularLight);
+  for (auto l : scene.lights) {
+    RGB += l->computeLight(hitPoint, directionToEye, materialProps.diffuse, materialProps.specular,
+                           materialProps.shininess, objectNormal);
   }
 
-  for (int lightIdx = 0; lightIdx < scene.directionalLights.size(); lightIdx++) {
-    lightXYZ = vec3(scene.directionalLights[lightIdx][0], scene.directionalLights[lightIdx][1], scene.directionalLights[lightIdx][2]);
-    lightRGB = vec3(scene.directionalLights[lightIdx][3], scene.directionalLights[lightIdx][4], scene.directionalLights[lightIdx][5]);
-    directionToLight = normalize(lightXYZ);
-    distanceToLight = -1.;
-    lightRGB = lightRGB/(defaultLightAttenuationCoeff[0] +
-                         defaultLightAttenuationCoeff[1]*distanceToLight +
-                         defaultLightAttenuationCoeff[2]*distanceToLight*distanceToLight
-                         );
-    halfVector = normalize (directionToLight + directionToEye);
-    diffuseLight = materialProps.diffuse * max( dot(objectNormal, directionToLight), 0.0f);
-    specularLight = materialProps.specular * (float) pow(max( dot(objectNormal, halfVector), 0.0f), materialProps.shininess);
-    RGB += lightRGB*(diffuseLight + specularLight);
-  }
   RGB = RGB * 255.0f;
+  RGB = glm::clamp(RGB, 0.f, 255.0f);
 
   RGBQUAD color;
   color.rgbRed = RGB[0];

@@ -104,13 +104,11 @@ void readfile(const char* filename, Scene& scene)
         // Process the lighting params
         if (cmd == "directional" or cmd == "point") {
             validinput = readvals(s, 6, values); // Position/color for lts.
-            std::vector<float> lightParams;
             if (validinput) {
-              for (i = 0; i < 6; i++) {
-                lightParams.push_back(values[i]);
-              }
-
-              scene.addLights(cmd, lightParams);
+              std::shared_ptr<LightSource> l;
+              if (cmd == "point") l = std::make_shared<PointLight>(values);
+              else l = std::make_shared<DirectionalLight>(values);
+              scene.addLight(l);
             }
         }
 
