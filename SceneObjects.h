@@ -47,6 +47,12 @@ class SceneObject {
         */
         virtual pair<float, vec3> hitTest(vec3& eye, vec3& rayDirection) = 0;
 
+        /**
+        * Fetch surface normal of object
+        *
+        * @param hitPoint - Point of intersection on object
+        * @return Normal of object
+        */
         virtual vec3 getNorm(vec3 hitPoint) = 0;
 
         /**
@@ -106,16 +112,25 @@ class Triangle : public SceneObject {
         */
         virtual void printInfo();
 
+        /**
+        * Fetch surface normal of triangle
+        *
+        * @param hitPoint - Point of intersection on triangle
+        * The normal of a triangle is independent of point of intersection,
+        * thus, a default argument of (0,0,0) is provided.
+        * @return Normal of triangle
+        */
         virtual vec3 getNorm(vec3 hitPoint = vec3(0,0,0));
         /**
         * Perform hit test on triangle.
         * Check if the ray cast from eye
         * intersects with the triangle.
         *
-        * @param eye - Emissive color of object (r,g,b)
-        * @param rayDirection - Shininess of object
-        * @return Returns the distance from the eye to the triangle,
-        * or -1 if ray does not intersect.
+        * @param eye - xyz location of eye
+        * @param rayDirection - direction of the ray being cast
+        * @return Returns a pair containing
+        * 1. Distance from the eye to the triangle, or -1 if ray does not intersect.
+        * 2. The point of intersection on the object
         */
         virtual pair<float, vec3> hitTest(vec3& eye, vec3& rayDirection);
   private:
@@ -149,8 +164,24 @@ class Sphere : public SceneObject {
         */
         virtual void printInfo();
 
+        /**
+        * Fetch surface normal of sphere
+        *
+        * @param hitPoint - Point of intersection on sphere
+        * @return Normal of sphere wrt hitPoint
+        */
         virtual vec3 getNorm(vec3 hitPoint);
-
+        /**
+        * Perform hit test on sphere.
+        * Check if the ray cast from eye
+        * intersects with the sphere.
+        *
+        * @param eye - xyz location of eye
+        * @param rayDirection - direction of the ray being cast
+        * @return Returns a pair containing
+        * 1. Distance from the eye to the sphere, or -1 if ray does not intersect.
+        * 2. The point of intersection on the object
+        */
         virtual pair<float, vec3> hitTest(vec3& eye, vec3& rayDirection);
 
   private:

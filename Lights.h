@@ -25,16 +25,40 @@ class LightSource {
  */
 class PointLight : public LightSource {
   public:
+        /**
+        * Initialize PointLight
+        * @param input - float array containing light info
+        *
+        */
         PointLight(float* input) :
             xyz(vec3(input[0], input[1], input[2])),
             rgb(vec3(input[3], input[4], input[5])) {}
 
+        /**
+        * Compute the light of this source at a given point
+        *
+        * @param hitPoint - Point at which light is to be computed
+        * @param directionToEye - Direction to the eye, used for specular light
+        * @param diffuse - Diffuse properties of parent object of point
+        * @param specular - Specular properties of parent object of point
+        * @param shininess - Shininess of parent object of point
+        * @param objectNormal - Surface Normal of object
+        */
         vec3 computeLight(vec3 hitPoint, vec3 directionToEye,
                           vec3 diffuse, vec3 specular, float shininess,
                           vec3 objectNormal);
+        /**
+        * Print info about object
+        *
+        */
         void printInfo();
+        /**
+        * Print info about object
+        * @return Position of light
+        */
         vec3 getLightPosition() {return xyz;}
   private:
+        // Light location, colour/intensity
         vec3 xyz, rgb;
 };
 
@@ -44,15 +68,39 @@ class PointLight : public LightSource {
  */
 class DirectionalLight : public LightSource {
   public:
+        /**
+        * Initialize DirectionalLight
+        * @param input - float array containing light info
+        *
+        */
         DirectionalLight(float* input) :
             xyz(vec3(input[0], input[1], input[2])),
             rgb(vec3(input[3], input[4], input[5])) {}
+        /**
+        * Compute the light of this source at a given point
+        *
+        * @param hitPoint - Point at which light is to be computed
+        * @param directionToEye - Direction to the eye, used for specular light
+        * @param diffuse - Diffuse properties of parent object of point
+        * @param specular - Specular properties of parent object of point
+        * @param shininess - Shininess of parent object of point
+        * @param objectNormal - Surface Normal of object
+        */
         vec3 computeLight(vec3 hitPoint, vec3 directionToEye,
                           vec3 diffuse, vec3 specular, float shininess,
                           vec3 objectNormal);
+        /**
+        * Print info about object
+        *
+        */
         void printInfo();
+        /**
+        * Print info about object
+        * @return Position of light
+        */
         vec3 getLightPosition() {return xyz;}
   private:
+        // Light location, colour/intensity
         vec3 xyz, rgb;
 };
 

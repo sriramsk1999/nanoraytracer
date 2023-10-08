@@ -19,9 +19,9 @@ using std::vector, std::string, std::shared_ptr, glm::vec3;
 class Scene {
     public:
         /**
-        * Add light to scene configuration
+        * Add light to scene
         *
-        * @param lightType - Type of light being added
+        * @param light - The light source being added to the scene
         */
         void addLight(shared_ptr<LightSource> light);
         /**

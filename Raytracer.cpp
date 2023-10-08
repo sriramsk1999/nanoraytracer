@@ -12,11 +12,14 @@ void Raytracer::rayTrace(Scene& scene) {
       // Convention: Ray is cast through center of pixel
       iCenter = i+0.5; jCenter = j+0.5;
       rayDirection = rayCast(iCenter, jCenter, scene);
-      // Get the id of the object being hit by the ray
+      // Get the id of the object being hit by the ray, and the hitPoint
       auto hitResults = hitTest(scene, rayDirection);
       objectIdx = hitResults.first;
       hitPoint = hitResults.second;
       if (objectIdx != -1)
+        // Compute light and set the colour at the current pixel
+        // height - j as FreeImage array is inverted
+        // origin at bottom left instead of top left
         setColor(i, height-j, objectIdx, hitPoint, scene);
     }
   }
@@ -57,18 +60,18 @@ pair<int, vec3> Raytracer::hitTest(Scene& scene, vec3 rayDirection) {
 }
 
 bool Raytracer::hitTest(Scene& scene, vec3 source, vec3 destination) {
-  // arbitrary hitTest from source to destination
-
   vec3 rayDirection = normalize(destination-source);
-  float epsilon = 0.001;
   bool hitsObject = false;
-  // move hitpoint towards light to avoid boundary issues
+  // Epsilon to slightly shift source towards destination,
+  // to avoid object intersecting with itself
+  float epsilon = 0.001;
   source = source + epsilon*rayDirection;
   for (auto obj : scene.sceneObjects) {
     auto objHitResults = obj->hitTest(source, rayDirection);
     float hitDistance = objHitResults.first;
     if (hitDistance > 0) {
       hitsObject=true;
+      break;
     }
   }
   return hitsObject;
@@ -82,14 +85,18 @@ void Raytracer::setColor(int i, int j, int objectIdx, vec3 hitPoint,
   vec3 directionToEye = normalize(scene.eye - hitPoint);
   bool isOccluded;
 
+  // Base light
   vec3 RGB = materialProps.ambient + materialProps.emission;
   for (auto l : scene.lights) {
+    // Check if light is visible from hitPoint
+    // If visible, add the specular and diffuse components
     isOccluded = hitTest(scene, hitPoint, l->getLightPosition());
     if (not(isOccluded))
       RGB += l->computeLight(hitPoint, directionToEye, materialProps.diffuse, materialProps.specular,
                             materialProps.shininess, objectNormal);
   }
   RGB = RGB * 255.0f;
+  //Clamp at permissible values for image
   RGB = glm::clamp(RGB, 0.f, 255.0f);
 
   RGBQUAD color;

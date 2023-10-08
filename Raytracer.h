@@ -46,15 +46,21 @@ class Raytracer {
         *
         * @param scene - Object describing the composition of the scene
         * @param rayDirection - Direction of the ray being cast
-        * @return id of the object being hit, -1 if no object
+        * @return Returns a pair containing
+        * 1. The id of the object intersected, or -1 if no object
+        * 2. The point of intersection on the object, or (0,0,0) if no object
         */
         pair<int, vec3> hitTest(Scene& scene, vec3 rayDirection);
         /**
-        * Check if a ray intersects with the objects in the scene
+        * Overload of hitTest. Supports ray being cast from arbitrary
+        * source and destination. E.g. A shadow ray being cast from an object
+        * to a light source.
         *
         * @param scene - Object describing the composition of the scene
-        * @param rayDirection - Direction of the ray being cast
-        * @return id of the object being hit, -1 if no object
+        * @param source - Source location of ray being cast
+        * @param destination - Destination of ray being cast
+        * @return boolean indicating whether any object in the scene
+        * was intersected by the ray
         */
         bool hitTest(Scene& scene, vec3 source, vec3 destination);
         /**
@@ -63,7 +69,8 @@ class Raytracer {
         * @param i - Pixel coord
         * @param j - Pixel coord
         * @param objectIdx - id of the object hit by ray
-        * @param scene - Object describing the composition of the scene
+        * @param hitPoint - The point on the object hit by ray
+        * @param scene - Scene object containing composition of scene
         */
         void setColor(int i, int j, int objectIdx, vec3 hitPoint,
                       Scene& scene);

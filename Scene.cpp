@@ -8,6 +8,7 @@ void Scene::addCamera(vec3 eye, vec3 center, vec3 up, float fovy) {
   Scene::center = center;
   Scene::up = up;
   Scene::fieldOfViewY = glm::radians(fovy);
+  // Computer fovx using fovy and the aspect ratio of the image
   Scene::fieldOfViewX = (2 * atan( tan(fieldOfViewY / 2) * ((float) width/ height)));
 }
 
