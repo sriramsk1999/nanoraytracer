@@ -23,8 +23,12 @@ class Raytracer {
         *
         * @param width - Width of output image
         * @param height - Height of output image
+        * @param fname - Name of output file
+        * @param maxdepth - Maximum number of bounces for a ray
         */
-        Raytracer(int width, int height);
+        void init(int width=640, int height=480,
+                  string fname="output.png",
+                  int maxdepth=5);
         ~Raytracer();
         /**
         * Raytrace a given scene
@@ -84,6 +88,8 @@ class Raytracer {
     private:
         FIBITMAP* image;
         int width, height;
+        int maxdepth;
+        string fname;
 };
 
 

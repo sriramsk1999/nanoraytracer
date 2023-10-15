@@ -111,12 +111,15 @@ void Raytracer::saveImage(string fname) {
   FreeImage_Save(FIF_PNG, image, fname.c_str(), 0);
 }
 
-Raytracer::Raytracer(int w, int h) {
+void Raytracer::init(int w, int h, string fname, int maxdepth) {
   FreeImage_Initialise();
   int bitsPerPixel = 24;
   width = w;
   height = h;
   image = FreeImage_Allocate(width, height, bitsPerPixel);
+
+  fname = fname;
+  maxdepth = maxdepth;
 }
 
 Raytracer::~Raytracer() {

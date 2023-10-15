@@ -20,8 +20,9 @@ int main(int argc, char *argv[]) {
     exit(-1);
   }
   Scene scene;
-  readfile(argv[1], scene);
-  Raytracer raytracer(scene.width, scene.height);
+  Raytracer raytracer;
+  readfile(argv[1], scene, raytracer);
+
   raytracer.rayTrace(scene);
 
   string fname = "output.png";

@@ -64,10 +64,13 @@ materialProperties initMaterialProperties(float* ambient,
   return materialProps;
 }
 
-void readfile(const char* filename, Scene& scene)
+void readfile(const char* filename, Scene& scene, Raytracer& raytracer)
 {
   string str, cmd; 
   ifstream in;
+
+  string outputFname = "output.png";
+  int maxdepth = 5;
 
   vec3 eye, up, center; // Positions of eye, center, up vectors
   int w, h; // Image size
@@ -112,7 +115,7 @@ void readfile(const char* filename, Scene& scene)
             }
         }
 
-        // Material Commands 
+        // Material Commands
         // Ambient, diffuse, specular, shininess properties for each object.
         // Filling this in is pretty straightforward, so I've left it in 
         // the skeleton, also as a hint of how to do the more complex ones.
@@ -269,6 +272,7 @@ void readfile(const char* filename, Scene& scene)
     }
 
     scene.addCamera(eye, center, up, fovy);
+    raytracer.init(scene.width, scene.height, outputFname, maxdepth);
   } else {
     cerr << "Unable to Open Input Data File " << filename << "\n"; 
     throw 2; 
