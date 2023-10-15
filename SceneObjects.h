@@ -95,17 +95,19 @@ class Triangle : public SceneObject {
         /**
         * Initialize a triangle
         *
-        * @param a - Triangle vertex (x,y,z)
-        * @param b - Triangle vertex (x,y,z)
-        * @param c - Triangle vertex (x,y,z)
+        * @param v1 - Triangle vertex (x,y,z)
+        * @param v2 - Triangle vertex (x,y,z)
+        * @param v3 - Triangle vertex (x,y,z)
         * @param materialProps - Material properties of object, used for lighting.
         * @param transform - 4x4 transform to be applied to object
         */
-        Triangle(vec3 a, vec3 b, vec3 c,
+        Triangle(vec3 v1, vec3 v2, vec3 v3,
                  materialProperties materialProps,
                  mat4 transform = mat4(1.0)) :
-                a(a), b(b), c(c),
-                SceneObject(materialProps, transform) {}
+                a(v1), b(v2), c(v3),
+                SceneObject(materialProps, transform) {
+                triNorm = normalize( cross (v2-v1, v3-v1));
+        }
         /**
         * Print paramters of Triangle
         *
@@ -135,6 +137,7 @@ class Triangle : public SceneObject {
         virtual pair<float, vec3> hitTest(vec3& eye, vec3& rayDirection);
   private:
         vec3 a,b,c;
+        vec3 triNorm;
 };
 
 /**

@@ -27,7 +27,6 @@ pair<float, vec3> Triangle::hitTest(vec3& eye, vec3& rayDirection) {
   auto transformedRay = getTransformedRay(eye, rayDirection);
   vec3 transEye = transformedRay.first;
   vec3 transDirection = transformedRay.second;
-  vec3 triNorm = getNorm();
 
   // Find distance between ray and plane
   ray2Plane = ( dot(a, triNorm) - dot(transEye, triNorm) ) / dot( transDirection, triNorm );
@@ -50,7 +49,7 @@ pair<float, vec3> Triangle::hitTest(vec3& eye, vec3& rayDirection) {
 }
 
 vec3 Triangle::getNorm(vec3 hitPoint) {
-  return normalize( cross (b-a, c-a));
+  return triNorm;
 }
 
 void Sphere::printInfo() {
