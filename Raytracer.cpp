@@ -107,18 +107,18 @@ void Raytracer::setColor(int i, int j, int objectIdx, vec3 hitPoint,
   FreeImage_SetPixelColor(image, i, j, &color);
 }
 
-void Raytracer::saveImage(string fname) {
+void Raytracer::saveImage() {
   FreeImage_Save(FIF_PNG, image, fname.c_str(), 0);
 }
 
-void Raytracer::init(int w, int h, string fname, int maxdepth) {
+void Raytracer::init(int w, int h, string outputFname, int maxdepth) {
   FreeImage_Initialise();
   int bitsPerPixel = 24;
   width = w;
   height = h;
   image = FreeImage_Allocate(width, height, bitsPerPixel);
 
-  fname = fname;
+  fname = outputFname;
   maxdepth = maxdepth;
 }
 

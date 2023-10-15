@@ -24,8 +24,6 @@ int main(int argc, char *argv[]) {
   readfile(argv[1], scene, raytracer);
 
   raytracer.rayTrace(scene);
-
-  string fname = "output.png";
-  raytracer.saveImage(fname);
+  raytracer.saveImage();
   return 0;
 }

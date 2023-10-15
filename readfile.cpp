@@ -77,6 +77,7 @@ void readfile(const char* filename, Scene& scene, Raytracer& raytracer)
   float fovy; // FOV of image
   vector <vec3> allVertices;
   vec3 vertex;
+  vec3 lightAttenuation(1.,0.,0.);
   // Material properties
   float ambient[3] = {0, 0, 0};
   float diffuse[3] = {0, 0, 0};
@@ -109,10 +110,24 @@ void readfile(const char* filename, Scene& scene, Raytracer& raytracer)
             validinput = readvals(s, 6, values); // Position/color for lts.
             if (validinput) {
               std::shared_ptr<LightSource> l;
-              if (cmd == "point") l = std::make_shared<PointLight>(values);
-              else l = std::make_shared<DirectionalLight>(values);
+              if (cmd == "point") l = std::make_shared<PointLight>(values, lightAttenuation);
+              else l = std::make_shared<DirectionalLight>(values, lightAttenuation);
               scene.addLight(l);
             }
+        }
+
+        else if (cmd == "attenuation") {
+          validinput = readvals(s, 3, values); // colors
+          if (validinput) {
+            lightAttenuation = vec3(values[0], values[1], values[2]);
+          }
+        }
+
+        else if (cmd == "maxdepth") {
+          validinput = readvals(s, 1, values); // colors
+          if (validinput) maxdepth = values[0];
+        } else if (cmd == "output") {
+          s >> outputFname;
         }
 
         // Material Commands

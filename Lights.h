@@ -11,12 +11,15 @@ using glm::vec3;
  */
 class LightSource {
   public:
-        LightSource() {};
+        LightSource(vec3 attenuationCoeff) :
+          attenuation(attenuationCoeff) {}
         virtual vec3 computeLight(vec3 hitPoint, vec3 directionToEye,
                           vec3 diffuse, vec3 specular, float shininess,
                           vec3 objectNormal) = 0;
         virtual void printInfo() = 0;
         virtual vec3 getLightPosition() = 0;
+  protected:
+        vec3 attenuation;
 };
 
 /**
@@ -28,11 +31,13 @@ class PointLight : public LightSource {
         /**
         * Initialize PointLight
         * @param input - float array containing light info
+        * @param attenuation - Coefficients for light attenuation
         *
         */
-        PointLight(float* input) :
+        PointLight(float* input, vec3 attenuation) :
             xyz(vec3(input[0], input[1], input[2])),
-            rgb(vec3(input[3], input[4], input[5])) {}
+            rgb(vec3(input[3], input[4], input[5])),
+            LightSource(attenuation) {}
 
         /**
         * Compute the light of this source at a given point
@@ -71,11 +76,13 @@ class DirectionalLight : public LightSource {
         /**
         * Initialize DirectionalLight
         * @param input - float array containing light info
+        * @param attenuation - Coefficients for light attenuation
         *
         */
-        DirectionalLight(float* input) :
+        DirectionalLight(float* input, vec3 attenuation) :
             xyz(vec3(input[0], input[1], input[2])),
-            rgb(vec3(input[3], input[4], input[5])) {}
+            rgb(vec3(input[3], input[4], input[5])),
+            LightSource(attenuation) {}
         /**
         * Compute the light of this source at a given point
         *

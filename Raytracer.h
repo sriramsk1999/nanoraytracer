@@ -81,9 +81,8 @@ class Raytracer {
         /**
         * Save the output image after raytracing
         *
-        * @param fname - Save filename
         */
-        void saveImage(string fname);
+        void saveImage();
 
     private:
         FIBITMAP* image;
