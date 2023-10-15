@@ -17,6 +17,8 @@ void Raytracer::rayTrace(Scene& scene) {
       // accounting for shadows and reflections
       color = recursiveRayTrace(scene, scene.eye, rayDirection,
                                 currentDepth);
+      // height - j as FreeImage array is inverted
+      // origin at bottom left instead of top left
       setColor(color, i, height-j);
     }
   }
@@ -27,32 +29,53 @@ vec3 Raytracer::recursiveRayTrace(Scene& scene, vec3 eye,
   vec3 color(0.,0.,0.);
   if (currentDepth >= maxdepth) return color;
 
-  vec3 hitPoint;
-  int objectIdx;
   // Get the id of the object being hit by the ray, and the hitPoint
   auto hitResults = hitTest(scene, eye, rayDirection);
-  objectIdx = hitResults.first;
-  hitPoint = hitResults.second;
-  if (objectIdx != -1) {
-    // Compute light and set the colour at the current pixel
-    // height - j as FreeImage array is inverted
-    // origin at bottom left instead of top left
-    auto object = scene.sceneObjects[objectIdx];
-    materialProperties materialProps = object->getMaterialProperties();
-    vec3 objectNormal = object->getNorm(hitPoint);
-    vec3 directionToEye = normalize(scene.eye - hitPoint);
-    bool isVisible;
+  int objectIdx = hitResults.first;
+  vec3 hitPoint = hitResults.second;
 
-    // Base light
-    color += materialProps.ambient + materialProps.emission;
-    for (auto l : scene.lights) {
-      // Check if light is visible from hitPoint
-      // If visible, add the specular and diffuse components
-      isVisible = isLightVisible(scene, hitPoint, l->getLightPosition());
-      if (isVisible)
-        color += l->computeLight(hitPoint, directionToEye, materialProps.diffuse, materialProps.specular,
-                              materialProps.shininess, objectNormal);
-    }
+  if (objectIdx != -1) {
+    // Get colour from ray at a single point
+    color = computeColorAtPoint(scene, objectIdx, eye, hitPoint);
+
+    auto object = scene.sceneObjects[objectIdx];
+    // Cast reflection ray from hitPoint
+    vec3 objectNormal = object->getNorm(hitPoint);
+    vec3 directionFromEye = normalize(hitPoint - eye);
+
+    // Reflected ray originates at point of intersection
+    vec3 reflectEye = hitPoint;
+    vec3 reflectDirection = directionFromEye - 2.0f * objectNormal * dot (directionFromEye, objectNormal);
+    // Reflected light is weighted by specularity of object
+    vec3 specular = object->getMaterialProperties().specular;
+    // Recursively compute light intensity
+    return color + specular*recursiveRayTrace(scene, reflectEye,
+                                              reflectDirection,
+                                              currentDepth+1);
+  }
+  return color;
+}
+
+vec3 Raytracer::computeColorAtPoint(Scene& scene, int objectIdx,
+                                    vec3 eye, vec3 hitPoint) {
+  vec3 color(0.,0.,0.);
+  // Compute light at the current pixel
+  auto object = scene.sceneObjects[objectIdx];
+  materialProperties materialProps = object->getMaterialProperties();
+  vec3 objectNormal = object->getNorm(hitPoint);
+  vec3 directionToEye = normalize(eye - hitPoint);
+  bool isVisible;
+
+  // Base light
+  color += materialProps.ambient + materialProps.emission;
+  for (auto l : scene.lights) {
+    // Check if light is visible from hitPoint
+    // If visible, add the specular and diffuse components
+    isVisible = isLightVisible(scene, hitPoint, l->getLightPosition());
+    if (isVisible)
+      color += l->computeLight(hitPoint, directionToEye, materialProps.diffuse,
+                               materialProps.specular, materialProps.shininess,
+                               objectNormal);
   }
   return color;
 }
@@ -125,7 +148,8 @@ void Raytracer::saveImage() {
   FreeImage_Save(FIF_PNG, image, fname.c_str(), 0);
 }
 
-void Raytracer::init(int w, int h, string outputFname, int maxdepth) {
+void Raytracer::init(int w, int h, string outputFname,
+                     int maximumRayTraceDepth) {
   FreeImage_Initialise();
   int bitsPerPixel = 24;
   width = w;
@@ -133,7 +157,7 @@ void Raytracer::init(int w, int h, string outputFname, int maxdepth) {
   image = FreeImage_Allocate(width, height, bitsPerPixel);
 
   fname = outputFname;
-  maxdepth = maxdepth;
+  maxdepth = maximumRayTraceDepth;
 }
 
 Raytracer::~Raytracer() {

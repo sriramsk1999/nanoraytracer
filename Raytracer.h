@@ -48,6 +48,15 @@ class Raytracer {
         vec3 recursiveRayTrace(Scene& scene, vec3 eye,
                                vec3 rayDirection, int currentDepth);
         /**
+        * Compute the colour from a single raytrace (without reflections)
+        *
+        * @param scene - Object describing the composition of the scene
+        * @param eye - Vector describing eye location
+        * @param rayDirection - Vector describing direction of ray
+        * @return The colour visible from this ray without considering reflections
+        */
+        vec3 computeColorAtPoint(Scene& scene, int objectIdx, vec3 eye, vec3 hitPoint);
+        /**
         * Cast a ray through a pixel into the scene
         *
         * @param iCenter - Coord of pixel (center of the pixel)
