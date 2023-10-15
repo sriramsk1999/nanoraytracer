@@ -5,7 +5,7 @@
 
 CC = g++
 
-CFLAGS = -g
+CFLAGS = -g -O3
 INCFLAGS = -I./include/glm-0.9.7.1 -I./include/
 LDFLAGS = -L./lib/ -lfreeimage
 
