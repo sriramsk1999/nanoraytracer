@@ -5,24 +5,56 @@
 
 void Raytracer::rayTrace(Scene& scene) {
   float iCenter, jCenter;
-  vec3 rayDirection, hitPoint;
-  int objectIdx;
+  vec3 rayDirection, color;
+  int currentDepth = 0;
   for (int i=0; i < width; i++) {
     for (int j=0; j < height; j++) {
       // Convention: Ray is cast through center of pixel
       iCenter = i+0.5; jCenter = j+0.5;
       rayDirection = rayCast(iCenter, jCenter, scene);
-      // Get the id of the object being hit by the ray, and the hitPoint
-      auto hitResults = hitTest(scene, rayDirection);
-      objectIdx = hitResults.first;
-      hitPoint = hitResults.second;
-      if (objectIdx != -1)
-        // Compute light and set the colour at the current pixel
-        // height - j as FreeImage array is inverted
-        // origin at bottom left instead of top left
-        setColor(i, height-j, objectIdx, hitPoint, scene);
+
+      // Recursively raytrace a given ray through the scene
+      // accounting for shadows and reflections
+      color = recursiveRayTrace(scene, scene.eye, rayDirection,
+                                currentDepth);
+      setColor(color, i, height-j);
     }
   }
+}
+
+vec3 Raytracer::recursiveRayTrace(Scene& scene, vec3 eye,
+                                  vec3 rayDirection, int currentDepth) {
+  vec3 color(0.,0.,0.);
+  if (currentDepth >= maxdepth) return color;
+
+  vec3 hitPoint;
+  int objectIdx;
+  // Get the id of the object being hit by the ray, and the hitPoint
+  auto hitResults = hitTest(scene, eye, rayDirection);
+  objectIdx = hitResults.first;
+  hitPoint = hitResults.second;
+  if (objectIdx != -1) {
+    // Compute light and set the colour at the current pixel
+    // height - j as FreeImage array is inverted
+    // origin at bottom left instead of top left
+    auto object = scene.sceneObjects[objectIdx];
+    materialProperties materialProps = object->getMaterialProperties();
+    vec3 objectNormal = object->getNorm(hitPoint);
+    vec3 directionToEye = normalize(scene.eye - hitPoint);
+    bool isVisible;
+
+    // Base light
+    color += materialProps.ambient + materialProps.emission;
+    for (auto l : scene.lights) {
+      // Check if light is visible from hitPoint
+      // If visible, add the specular and diffuse components
+      isVisible = isLightVisible(scene, hitPoint, l->getLightPosition());
+      if (isVisible)
+        color += l->computeLight(hitPoint, directionToEye, materialProps.diffuse, materialProps.specular,
+                              materialProps.shininess, objectNormal);
+    }
+  }
+  return color;
 }
 
 vec3 Raytracer::rayCast(float iCenter, float jCenter, Scene& scene) {
@@ -40,7 +72,7 @@ vec3 Raytracer::rayCast(float iCenter, float jCenter, Scene& scene) {
   return ray_direction;
 }
 
-pair<int, vec3> Raytracer::hitTest(Scene& scene, vec3 rayDirection) {
+pair<int, vec3> Raytracer::hitTest(Scene& scene, vec3 eye, vec3 rayDirection) {
   float hitDistance, minHitDistance = Z_FAR;
   vec3 hitPoint(0,0,0);
   int intersectObjectIdx = -1;
@@ -48,7 +80,7 @@ pair<int, vec3> Raytracer::hitTest(Scene& scene, vec3 rayDirection) {
   // Find the object first hit by the ray i.e. minimum hit distance
   for (int i = 0; i < scene.sceneObjects.size(); i++) {
     auto obj = scene.sceneObjects[i];
-    auto objHitResults = obj->hitTest(scene.eye, rayDirection);
+    auto objHitResults = obj->hitTest(eye, rayDirection);
     hitDistance = objHitResults.first;
     if (hitDistance > 0 and hitDistance < minHitDistance) {
       minHitDistance = hitDistance;
@@ -59,42 +91,25 @@ pair<int, vec3> Raytracer::hitTest(Scene& scene, vec3 rayDirection) {
   return make_pair(intersectObjectIdx, hitPoint);
 }
 
-bool Raytracer::hitTest(Scene& scene, vec3 source, vec3 destination) {
-  vec3 rayDirection = normalize(destination-source);
-  bool hitsObject = false;
+bool Raytracer::isLightVisible(Scene& scene, vec3 eye, vec3 lightpos) {
+  vec3 rayDirection = normalize(lightpos-eye);
+  bool isVisible = true;
   // Epsilon to slightly shift source towards destination,
   // to avoid object intersecting with itself
   float epsilon = 0.001;
-  source = source + epsilon*rayDirection;
+  eye = eye + epsilon*rayDirection;
   for (auto obj : scene.sceneObjects) {
-    auto objHitResults = obj->hitTest(source, rayDirection);
+    auto objHitResults = obj->hitTest(eye, rayDirection);
     float hitDistance = objHitResults.first;
     if (hitDistance > 0) {
-      hitsObject=true;
+      isVisible = false;
       break;
     }
   }
-  return hitsObject;
+  return isVisible;
 }
 
-void Raytracer::setColor(int i, int j, int objectIdx, vec3 hitPoint,
-                         Scene& scene) {
-  auto object = scene.sceneObjects[objectIdx];
-  materialProperties materialProps = object->getMaterialProperties();
-  vec3 objectNormal = object->getNorm(hitPoint);
-  vec3 directionToEye = normalize(scene.eye - hitPoint);
-  bool isOccluded;
-
-  // Base light
-  vec3 RGB = materialProps.ambient + materialProps.emission;
-  for (auto l : scene.lights) {
-    // Check if light is visible from hitPoint
-    // If visible, add the specular and diffuse components
-    isOccluded = hitTest(scene, hitPoint, l->getLightPosition());
-    if (not(isOccluded))
-      RGB += l->computeLight(hitPoint, directionToEye, materialProps.diffuse, materialProps.specular,
-                            materialProps.shininess, objectNormal);
-  }
+void Raytracer::setColor(vec3 RGB, int i, int j) {
   RGB = RGB * 255.0f;
   //Clamp at permissible values for image
   RGB = glm::clamp(RGB, 0.f, 255.0f);
@@ -103,7 +118,6 @@ void Raytracer::setColor(int i, int j, int objectIdx, vec3 hitPoint,
   color.rgbRed = RGB[0];
   color.rgbGreen = RGB[1];
   color.rgbBlue = RGB[2];
-
   FreeImage_SetPixelColor(image, i, j, &color);
 }
 

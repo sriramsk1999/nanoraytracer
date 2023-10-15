@@ -37,6 +37,17 @@ class Raytracer {
         */
         void rayTrace(Scene& scene);
         /**
+        * Recursively raytrace a single ray
+        *
+        * @param scene - Object describing the composition of the scene
+        * @param eye - Vector describing eye location
+        * @param rayDirection - Vector describing direction of ray
+        * @param currentDepth - Number of times ray has bounced
+        * @return The colour visible from this ray
+        */
+        vec3 recursiveRayTrace(Scene& scene, vec3 eye,
+                               vec3 rayDirection, int currentDepth);
+        /**
         * Cast a ray through a pixel into the scene
         *
         * @param iCenter - Coord of pixel (center of the pixel)
@@ -49,35 +60,31 @@ class Raytracer {
         * Check if a ray intersects with the objects in the scene
         *
         * @param scene - Object describing the composition of the scene
+        * @param eye - Vector describing eye location
         * @param rayDirection - Direction of the ray being cast
         * @return Returns a pair containing
         * 1. The id of the object intersected, or -1 if no object
         * 2. The point of intersection on the object, or (0,0,0) if no object
         */
-        pair<int, vec3> hitTest(Scene& scene, vec3 rayDirection);
+        pair<int, vec3> hitTest(Scene& scene, vec3 eye, vec3 rayDirection);
         /**
-        * Overload of hitTest. Supports ray being cast from arbitrary
-        * source and destination. E.g. A shadow ray being cast from an object
-        * to a light source.
+        * Checks if light is visible from given eye location.
+        * Used to implement shadows.
         *
         * @param scene - Object describing the composition of the scene
-        * @param source - Source location of ray being cast
-        * @param destination - Destination of ray being cast
-        * @return boolean indicating whether any object in the scene
-        * was intersected by the ray
+        * @param eye - Point from which the check is being made
+        * @param lightpos - The position of a given light
+        * @return boolean indicating whether the light is visible from eye
         */
-        bool hitTest(Scene& scene, vec3 source, vec3 destination);
+        bool isLightVisible(Scene& scene, vec3 eye, vec3 lightpos);
         /**
-        * Set the colour of a pixel based on the object struck by it
+        * Set the colour of a pixel
         *
+        * @param RGB - Colour to be set
         * @param i - Pixel coord
         * @param j - Pixel coord
-        * @param objectIdx - id of the object hit by ray
-        * @param hitPoint - The point on the object hit by ray
-        * @param scene - Scene object containing composition of scene
         */
-        void setColor(int i, int j, int objectIdx, vec3 hitPoint,
-                      Scene& scene);
+        void setColor(vec3 RGB, int i, int j);
         /**
         * Save the output image after raytracing
         *
