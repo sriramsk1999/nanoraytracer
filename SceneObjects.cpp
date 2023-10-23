@@ -88,12 +88,15 @@ pair<float, vec3> Sphere::hitTest(vec3& eye, vec3& rayDirection) {
     root1 = (-b + pow(discriminant, 0.5))/(2*a);
     root2 = (-b - pow(discriminant, 0.5))/(2*a);
 
-    if (root1 < root2 and root1 > 0) hitDistance = root1;
-    else hitDistance = root2;
+    if (root1 < 0 and root2 < 0) hitDistance = -1; //object behind ray
+    else {
+      if (root1 < root2 and root1 > 0) hitDistance = root1;
+      else hitDistance = root2;
 
-    hitPoint = transEye + transDirection*hitDistance;
-    hitPoint = vec3(transform * vec4(hitPoint, 1.0));
-    hitDistance = length(eye-hitPoint);
+      hitPoint = transEye + transDirection*hitDistance;
+      hitPoint = vec3(transform * vec4(hitPoint, 1.0));
+      hitDistance = length(eye-hitPoint);
+    }
   }
   return make_pair(hitDistance, hitPoint);
 }

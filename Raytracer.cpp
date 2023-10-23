@@ -19,7 +19,8 @@ void Raytracer::rayTrace(Scene& scene) {
                                 currentDepth);
       // height - j as FreeImage array is inverted
       // origin at bottom left instead of top left
-      setColor(color, i, height-j);
+      // height - j -1 to align properly with autograder
+      setColor(color, i, height-j-1);
     }
   }
 }
