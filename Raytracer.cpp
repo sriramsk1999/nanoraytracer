@@ -46,7 +46,11 @@ vec3 Raytracer::recursiveRayTrace(Scene& scene, vec3 eye,
 
     // Reflected ray originates at point of intersection
     vec3 reflectEye = hitPoint;
-    vec3 reflectDirection = directionFromEye - 2.0f * objectNormal * dot (directionFromEye, objectNormal);
+    vec3 reflectDirection = directionFromEye - (2.0f * objectNormal * dot (directionFromEye, objectNormal));
+    // Epsilon to slightly shift source towards destination,
+    // to avoid object intersecting with itself
+    float epsilon = 0.001;
+    reflectEye = reflectEye + epsilon*reflectDirection;
     // Reflected light is weighted by specularity of object
     vec3 specular = object->getMaterialProperties().specular;
     // Recursively compute light intensity
