@@ -102,5 +102,11 @@ pair<float, vec3> Sphere::hitTest(vec3& eye, vec3& rayDirection) {
 }
 
 vec3 Sphere::getNorm(vec3 hitPoint) {
-  return normalize(hitPoint - center);
+  // Extract the hitPoint before transform so that normal
+  // can be computed correctly
+  vec3 transHitPoint = vec3(inverse(transform) * vec4(hitPoint, 1.0));
+  mat4 invTransposeTransform = inverse( transpose (transform) );
+  vec3 normal = transHitPoint - center;
+  normal = normalize(mat3(invTransposeTransform) * normal);
+  return normal;
 }
