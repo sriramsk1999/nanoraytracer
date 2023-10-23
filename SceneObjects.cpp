@@ -42,6 +42,7 @@ pair<float, vec3> Triangle::hitTest(vec3& eye, vec3& rayDirection) {
       (pointA[1]<0 and pointB[1]<0 and pointC[1]<0) or
       (pointA[2]>0 and pointB[2]>0 and pointC[2]>0) or
       (pointA[2]<0 and pointB[2]<0 and pointC[2]<0)) {
+    hitPoint = vec3(transform * vec4(hitPoint, 1.0));
     hitDistance = ray2Plane;
   }
   else hitDistance = -1; // Does not intersect triangle
