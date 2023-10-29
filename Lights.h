@@ -2,6 +2,7 @@
 #define LIGHTS_H_
 
 #include "Transform.h"
+#define Z_FAR 1000000
 
 using glm::vec3;
 
@@ -18,6 +19,7 @@ class LightSource {
                           vec3 objectNormal) = 0;
         virtual void printInfo() = 0;
         virtual vec3 getLightPosition() = 0;
+        virtual float getDistanceToLight(vec3 p) = 0;
   protected:
         vec3 attenuation;
 };
@@ -48,6 +50,7 @@ class PointLight : public LightSource {
         * @param specular - Specular properties of parent object of point
         * @param shininess - Shininess of parent object of point
         * @param objectNormal - Surface Normal of object
+        * @return The colour after computing the light
         */
         vec3 computeLight(vec3 hitPoint, vec3 directionToEye,
                           vec3 diffuse, vec3 specular, float shininess,
@@ -58,10 +61,16 @@ class PointLight : public LightSource {
         */
         void printInfo();
         /**
-        * Print info about object
+        * Get the position of the light
         * @return Position of light
         */
         vec3 getLightPosition() {return xyz;}
+        /**
+        * Get distance to light from a given point.
+        * @param p - Point to compute distance from
+        * @return Distance of light
+        */
+        float getDistanceToLight(vec3 p) {return length(xyz-p);}
   private:
         // Light location, colour/intensity
         vec3 xyz, rgb;
@@ -92,6 +101,7 @@ class DirectionalLight : public LightSource {
         * @param specular - Specular properties of parent object of point
         * @param shininess - Shininess of parent object of point
         * @param objectNormal - Surface Normal of object
+        * @return The colour after computing the light
         */
         vec3 computeLight(vec3 hitPoint, vec3 directionToEye,
                           vec3 diffuse, vec3 specular, float shininess,
@@ -102,10 +112,17 @@ class DirectionalLight : public LightSource {
         */
         void printInfo();
         /**
-        * Print info about object
+        * Get the position of the light
         * @return Position of light
         */
         vec3 getLightPosition() {return xyz;}
+        /**
+        * Get distance to light from a given point.
+        * As directional light is infinitely far away, return Z_FAR
+        * @param p - Point to compute distance from
+        * @return Distance of light
+        */
+        float getDistanceToLight(vec3 p) {return Z_FAR;}
   private:
         // Light location, colour/intensity
         vec3 xyz, rgb;

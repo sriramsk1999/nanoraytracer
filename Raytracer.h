@@ -82,10 +82,10 @@ class Raytracer {
         *
         * @param scene - Object describing the composition of the scene
         * @param eye - Point from which the check is being made
-        * @param lightpos - The position of a given light
+        * @param light - Object for a given light source
         * @return boolean indicating whether the light is visible from eye
         */
-        bool isLightVisible(Scene& scene, vec3 eye, vec3 lightpos);
+        bool isLightVisible(Scene& scene, vec3 eye, shared_ptr<LightSource> light);
         /**
         * Set the colour of a pixel
         *

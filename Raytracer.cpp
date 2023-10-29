@@ -76,7 +76,7 @@ vec3 Raytracer::computeColorAtPoint(Scene& scene, int objectIdx,
   for (auto l : scene.lights) {
     // Check if light is visible from hitPoint
     // If visible, add the specular and diffuse components
-    isVisible = isLightVisible(scene, hitPoint, l->getLightPosition());
+    isVisible = isLightVisible(scene, hitPoint, l);
     if (isVisible)
       color += l->computeLight(hitPoint, directionToEye, materialProps.diffuse,
                                materialProps.specular, materialProps.shininess,
@@ -119,7 +119,9 @@ pair<int, vec3> Raytracer::hitTest(Scene& scene, vec3 eye, vec3 rayDirection) {
   return make_pair(intersectObjectIdx, hitPoint);
 }
 
-bool Raytracer::isLightVisible(Scene& scene, vec3 eye, vec3 lightpos) {
+bool Raytracer::isLightVisible(Scene& scene, vec3 eye, shared_ptr<LightSource> l) {
+  vec3 lightpos = l->getLightPosition();
+  float distanceToLight = l->getDistanceToLight(eye);
   vec3 rayDirection = normalize(lightpos-eye);
   bool isVisible = true;
   // Epsilon to slightly shift source towards destination,
@@ -129,7 +131,8 @@ bool Raytracer::isLightVisible(Scene& scene, vec3 eye, vec3 lightpos) {
   for (auto obj : scene.sceneObjects) {
     auto objHitResults = obj->hitTest(eye, rayDirection);
     float hitDistance = objHitResults.first;
-    if (hitDistance > 0) {
+    // object should be between eye and lightpos
+    if (hitDistance > 0 and hitDistance < distanceToLight) {
       isVisible = false;
       break;
     }
