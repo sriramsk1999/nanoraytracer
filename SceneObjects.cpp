@@ -36,14 +36,15 @@ pair<float, vec3> Triangle::hitTest(vec3& eye, vec3& rayDirection) {
   pointB = cross(c-b, hitPoint-b);
   pointC = cross(a-c, hitPoint-c);
 
-  if ((pointA[0]>0 and pointB[0]>0 and pointC[0]>0) or
+  if (ray2Plane < 0) hitDistance = -1; // object behind ray
+  else if ((pointA[0]>0 and pointB[0]>0 and pointC[0]>0) or
       (pointA[0]<0 and pointB[0]<0 and pointC[0]<0) or
       (pointA[1]>0 and pointB[1]>0 and pointC[1]>0) or
       (pointA[1]<0 and pointB[1]<0 and pointC[1]<0) or
       (pointA[2]>0 and pointB[2]>0 and pointC[2]>0) or
       (pointA[2]<0 and pointB[2]<0 and pointC[2]<0)) {
     hitPoint = vec3(transform * vec4(hitPoint, 1.0));
-    hitDistance = ray2Plane;
+    hitDistance = length(eye - hitPoint);
   }
   else hitDistance = -1; // Does not intersect triangle
   return make_pair(hitDistance, hitPoint);
