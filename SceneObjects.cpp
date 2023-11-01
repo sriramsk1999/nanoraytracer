@@ -1,5 +1,6 @@
 #include <vector>
 #include <iostream>
+#include <glm/gtc/random.hpp>
 #include "SceneObjects.h"
 
 using std::vector, std::pair, std::make_pair, glm::vec3;
@@ -32,17 +33,20 @@ pair<float, vec3> Triangle::hitTest(vec3& eye, vec3& rayDirection) {
   ray2Plane = ( dot(a, triNorm) - dot(transEye, triNorm) ) / dot( transDirection, triNorm );
   hitPoint = transEye + transDirection*ray2Plane;
 
-  pointA = cross(b-a, hitPoint-a);
-  pointB = cross(c-b, hitPoint-b);
-  pointC = cross(a-c, hitPoint-c);
+  // Add noise to slightly jitter the points
+  // Helps deal with precision issues at edges of triangles
+  float eps = glm::gaussRand(-0.001f, 0.001f);
+
+  pointA = normalize(cross(b-a, hitPoint-a+eps));
+  pointB = normalize(cross(c-b, hitPoint-b+eps));
+  pointC = normalize(cross(a-c, hitPoint-c+eps));
+
+  float normDotA = dot(pointA, triNorm);
+  float normDotB = dot(pointB, triNorm);
+  float normDotC = dot(pointC, triNorm);
 
   if (ray2Plane < 0) hitDistance = -1; // object behind ray
-  else if ((pointA[0]>0 and pointB[0]>0 and pointC[0]>0) or
-      (pointA[0]<0 and pointB[0]<0 and pointC[0]<0) or
-      (pointA[1]>0 and pointB[1]>0 and pointC[1]>0) or
-      (pointA[1]<0 and pointB[1]<0 and pointC[1]<0) or
-      (pointA[2]>0 and pointB[2]>0 and pointC[2]>0) or
-      (pointA[2]<0 and pointB[2]<0 and pointC[2]<0)) {
+  else if (normDotA >= 0 and normDotB >= 0 and normDotC >= 0) {
     hitPoint = vec3(transform * vec4(hitPoint, 1.0));
     hitDistance = length(eye - hitPoint);
   }
