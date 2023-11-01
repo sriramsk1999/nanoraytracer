@@ -51,7 +51,9 @@ pair<float, vec3> Triangle::hitTest(vec3& eye, vec3& rayDirection) {
 }
 
 vec3 Triangle::getNorm(vec3 hitPoint) {
-  return triNorm;
+  mat4 invTransposeTransform = inverse( transpose (transform) );
+  vec3 transNorm = normalize(mat3(invTransposeTransform) * triNorm);
+  return transNorm;
 }
 
 void Sphere::printInfo() {
